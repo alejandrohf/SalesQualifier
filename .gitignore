@@ -50,6 +50,10 @@ token*.json
 *.sqlite3
 *.log
 
+# Local/reference PDFs that should not be published
+data/references/
+seed_data/pdfs/
+
 # OS / temp files
 tmp/
 temp/
