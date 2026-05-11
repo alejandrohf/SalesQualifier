@@ -1,0 +1,85 @@
+[project]
+name = "sales-qualification-agent"
+version = "0.1.0"
+description = "Plataforma inteligente de cualificación de oportunidades (MEDDICC) con agentes LLM, FastAPI y Streamlit."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+
+authors = [
+  { name = "Alejandro Hidalgo Fernández" }
+]
+
+# Dependencias runtime (lo necesario para ejecutar API + UI + agentes)
+dependencies = [
+  # --- API ---
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.27",
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "python-dotenv>=1.0",
+  "requests>=2.31",
+  "passlib[bcrypt]>=1.7.4",
+  "python-jose[cryptography]>=3.3.0",
+  "email-validator>=2.2.0",
+
+  # --- UI ---
+  "streamlit>=1.31",
+
+  # --- LLM / Agents ---
+  "langchain>=0.2.10",
+  "langchain-community>=0.2.10",
+  "langchain-openai>=0.1.16",
+  "langgraph>=0.2.10",
+
+  # --- Tools ---
+  "tavily-python>=0.7.0",
+
+  # Gmail Toolkit usa google API libs
+  "google-api-python-client>=2.120",
+  "google-auth>=2.28",
+  "google-auth-oauthlib>=1.2",
+]
+
+[project.optional-dependencies]
+# Dependencias para desarrollo (tests, lint, etc.)
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "ruff>=0.5",
+  "mypy>=1.8",
+  "types-requests>=2.31",
+]
+
+# E2E opcional (si llegas a automatizar UI)
+e2e = [
+  "playwright>=1.40",
+]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+  "app*",
+  "agents*",
+  "domain*",
+  "interfaces*",
+  "schemas*",
+  "tools*",
+  "workflows*",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

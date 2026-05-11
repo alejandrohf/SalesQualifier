@@ -1,0 +1,56 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Environment / local config
+.env
+.env.*
+
+# Streamlit local config
+.streamlit/
+
+# IDEs / editors
+.vscode/
+.idea/
+
+# Local credentials / secrets
+credentials/
+*.pem
+*.key
+*.p12
+client_secret*.json
+token*.json
+
+# Local databases / logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# OS / temp files
+tmp/
+temp/
+*.tmp
