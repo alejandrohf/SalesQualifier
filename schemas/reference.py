@@ -1,6 +1,5 @@
 """Schemas y enums del catálogo de referencias corporativas y su metadata."""
 
-# schemas/reference.py
 from __future__ import annotations
 
 from datetime import datetime

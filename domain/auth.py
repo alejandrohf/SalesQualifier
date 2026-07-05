@@ -1,5 +1,4 @@
 """Utilidades de autenticación y gestión de tokens del dominio.
-
 Incluye hashing de contraseñas, creación y validación de JWT y helpers para
 reseteo seguro de contraseñas.
 """

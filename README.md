@@ -86,8 +86,16 @@ source venv/bin/activate
 
 ```bash
 pip install -U pip
-pip install -r requirements.txt
+pip install -e .
 ```
+
+Para entorno de desarrollo, con herramientas de test y análisis estático:
+
+```bash
+pip install -e .[dev]
+```
+
+La **fuente principal de verdad** para metadatos y dependencias es `pyproject.toml`. El fichero `requirements.txt` se mantiene únicamente como vía de compatibilidad y delega la instalación en el propio proyecto.
 
 ## Puesta en marcha rápida
 
@@ -102,14 +110,14 @@ docker compose up -d db
   --first-name Admin \
   --last-name User \
   --password Admin1234
-uvicorn interfaces.api.main:app --reload
+./venv/bin/uvicorn interfaces.api.main:app --reload
 ```
 
 En una segunda terminal, para la interfaz web:
 
 ```bash
 source venv/bin/activate
-streamlit run interfaces/ui/0_Login.py
+./venv/bin/streamlit run interfaces/ui/0_Login.py
 ```
 
 ## Configuración de entorno
@@ -184,7 +192,7 @@ Si se quiere poblar el sistema con referencias corporativas y oportunidades de d
 ### Lanzar la API
 
 ```bash
-uvicorn interfaces.api.main:app --reload
+./venv/bin/uvicorn interfaces.api.main:app --reload
 ```
 
 API disponible en:
@@ -195,7 +203,7 @@ API disponible en:
 ### Lanzar la interfaz web
 
 ```bash
-streamlit run interfaces/ui/0_Login.py
+./venv/bin/streamlit run interfaces/ui/0_Login.py
 ```
 
 UI disponible en:
@@ -207,7 +215,7 @@ UI disponible en:
 Ejecutar la suite automatizada:
 
 ```bash
-./venv/bin/pytest
+pytest
 ```
 
 ## Licencia

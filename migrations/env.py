@@ -1,4 +1,3 @@
-# migrations/env.py
 from __future__ import annotations
 
 import os
@@ -13,7 +12,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# ✅ IMPORTA TU BASE Y MODELOS PARA target_metadata
+# IMPORTAMOS LA BASE Y MODELOS PARA target_metadata
 from infrastructure.db.base import Base  # <- tu Base(DeclarativeBase)
 from infrastructure.db import models  # noqa: F401  (importa CustomerReferenceORM, ReferenceEmbeddingORM)
 

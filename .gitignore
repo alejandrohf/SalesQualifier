@@ -27,7 +27,6 @@ pip-wheel-metadata/
 
 # Environment / local config
 .env
-.env.*
 
 # Streamlit local config
 .streamlit/

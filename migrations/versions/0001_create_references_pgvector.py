@@ -1,4 +1,3 @@
-# migrations/versions/0001_create_references_pgvector.py
 from __future__ import annotations
 
 from alembic import op
@@ -68,7 +67,6 @@ def upgrade() -> None:
     op.create_index("uq_ref_chunk", "reference_embeddings", ["reference_id", "chunk_index"], unique=True)
 
     # ivfflat index (ANN)
-    # Nota: para que este índice sea útil en producción real hay que hacer ANALYZE y tener bastantes filas.
     op.execute(
         """
         CREATE INDEX IF NOT EXISTS idx_ref_embed_ivfflat
@@ -80,7 +78,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # OJO: no se recomienda eliminar extensiones en downgrade (pueden usarse en otros módulos)
     op.execute("DROP INDEX IF EXISTS idx_ref_embed_ivfflat;")
     op.drop_index("uq_ref_chunk", table_name="reference_embeddings")
     op.drop_table("reference_embeddings")

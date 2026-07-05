@@ -1,6 +1,5 @@
 """Agente que recupera referencias internas similares usando búsqueda vectorial."""
 
-# agents/references_match_agent.py
 from __future__ import annotations
 
 from langgraph.prebuilt import create_react_agent

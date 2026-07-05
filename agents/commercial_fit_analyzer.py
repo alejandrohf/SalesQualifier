@@ -1,6 +1,5 @@
 """Agente especializado en encaje comercial, riesgo de margen y estrategia contractual."""
 
-# agents/commercial_fit_analyzer.py
 from __future__ import annotations
 
 from langgraph.prebuilt import create_react_agent

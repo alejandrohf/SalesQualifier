@@ -1,6 +1,5 @@
 """Extracción de texto y fragmentación de documentos PDF para indexación semántica."""
 
-# tools/pdf_loader.py
 from __future__ import annotations
 
 from dataclasses import dataclass

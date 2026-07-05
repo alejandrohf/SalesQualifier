@@ -1,6 +1,5 @@
 """Agente especializado en detectar riesgos comerciales, técnicos y operativos."""
 
-# agents/risk_analyzer.py
 from __future__ import annotations
 
 from langgraph.prebuilt import create_react_agent

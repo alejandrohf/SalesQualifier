@@ -1,6 +1,5 @@
-"""Módulo de definición de Objetos de la API de la plataforma Sales Qualification Agent."""
+"""Esquemas de entrada y salida utilizados por los endpoints principales de la API."""
 
-# schemas/api.py
 from __future__ import annotations
 
 from typing import Optional

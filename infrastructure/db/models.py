@@ -4,7 +4,6 @@ Define las tablas principales de referencias, embeddings, oportunidades,
 usuarios y tokens de reseteo de contraseña.
 """
 
-# infrastructure/db/models.py
 from __future__ import annotations
 
 from datetime import datetime

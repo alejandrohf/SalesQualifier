@@ -1,6 +1,5 @@
 """Cliente HTTP de la interfaz Streamlit para consumir la API del backend."""
 
-# interfaces/ui/client.py
 from __future__ import annotations
 
 import os
@@ -26,7 +25,7 @@ class ApiError(RuntimeError):
 
 
 class ApiClient:
-    """Wrapper de alto nivel sobre `requests` con métodos alineados con la API del proyecto."""
+    """Cliente HTTP con métodos tipados para los endpoints usados por la interfaz web."""
     def __init__(self, cfg: ApiClientConfig):
         self.cfg = cfg
         self.session = requests.Session()
@@ -57,9 +56,6 @@ class ApiClient:
             )
         return data
 
-    # -----------------------
-    # Core endpoints
-    # -----------------------
     def health(self) -> Dict[str, Any]:
         return self._handle(self.session.get(self._url("/api/health"), timeout=self.cfg.timeout_s))
 
@@ -73,9 +69,6 @@ class ApiClient:
         payload: Dict[str, Any] = {"opportunity": opportunity, "metadata": {}}
         return self._handle(self.session.post(self._url("/api/qualify"), json=payload, timeout=self.cfg.timeout_s))
 
-    # -----------------------
-    # Auth endpoints
-    # -----------------------
     def login(self, *, email: str, password: str) -> Dict[str, Any]:
         data = self._handle(
             self.session.post(
@@ -158,9 +151,6 @@ class ApiClient:
             )
         )
 
-    # -----------------------
-    # References endpoints
-    # -----------------------
     def list_references(self, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
         return self._handle(
             self.session.get(
@@ -211,7 +201,6 @@ class ApiClient:
         return self._url(f"/api/references/{reference_id}/download")
 
     def search_references(self, query: str) -> Dict[str, Any]:
-        # Si tu API no implementa /api/references/search todavía, puedes comentar este método
         payload = {"query": query}
         return self._handle(
             self.session.post(
@@ -222,8 +211,7 @@ class ApiClient:
         )
 
 def get_api_client() -> ApiClient:
-    # Configurable por env var. Fallback para local dev.
-    """Construye un cliente API usando la configuración disponible en variables de entorno."""
+    """Construye el cliente HTTP a partir de la configuración disponible en el entorno."""
     base_url = os.getenv("API_BASE_URL", "http://localhost:8000")
     timeout_s = int(os.getenv("API_TIMEOUT_S", "180"))
     return ApiClient(ApiClientConfig(base_url=base_url, timeout_s=timeout_s))

@@ -1,14 +1,4 @@
-# domain/__init__.py
-"""
-Domain layer (lógica de negocio determinista).
-
-Esta capa NO depende de:
-- LangChain / LLM
-- Streamlit
-- FastAPI
-
-Contiene reglas, decisiones y scoring testeables con pytest.
-"""
+"""Capa de dominio con reglas de negocio, scoring y decisiones deterministas."""
 
 from .scoring import (
     ADJUSTMENTS,

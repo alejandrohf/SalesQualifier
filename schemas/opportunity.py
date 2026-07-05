@@ -1,6 +1,5 @@
 """Schemas de entrada y persistencia lógica para oportunidades comerciales."""
 
-# schemas/opportunity.py
 from __future__ import annotations
 
 from datetime import datetime

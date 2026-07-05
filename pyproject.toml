@@ -18,6 +18,7 @@ dependencies = [
   "pydantic>=2.6",
   "pydantic-settings>=2.2",
   "python-dotenv>=1.0",
+  "python-multipart>=0.0.9",
   "requests>=2.31",
   "passlib[bcrypt]>=1.7.4",
   "python-jose[cryptography]>=3.3.0",
@@ -26,14 +27,23 @@ dependencies = [
   # --- UI ---
   "streamlit>=1.31",
 
+  # --- Persistence ---
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "psycopg[binary]>=3.1",
+  "pgvector>=0.2",
+
   # --- LLM / Agents ---
   "langchain>=0.2.10",
+  "langchain-core>=0.2.10",
   "langchain-community>=0.2.10",
   "langchain-openai>=0.1.16",
+  "langchain-text-splitters>=0.2.0",
   "langgraph>=0.2.10",
 
   # --- Tools ---
   "tavily-python>=0.7.0",
+  "pypdf>=4.2.0",
 
   # Gmail Toolkit usa google API libs
   "google-api-python-client>=2.120",

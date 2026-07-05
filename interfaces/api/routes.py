@@ -1,6 +1,5 @@
 """Rutas principales de cualificación, monitorización y revisión técnica."""
 
-# interfaces/api/routes.py
 from __future__ import annotations
 
 import uuid
@@ -32,39 +31,33 @@ from schemas.meddicc import MeddiccReport
 
 router = APIRouter(tags=["qualification"])
 
-# -------------------------
-# Response models (envelopes)
-# -------------------------
 
 class HealthResponse(Dict[str, Any]):
-    """(docs-only) estructura del health check."""
+    """Representación documental de la respuesta del endpoint de salud."""
 
 
 class ApiStatusResponse(Dict[str, Any]):
-    """(docs-only) estructura del api-status."""
+    """Representación documental del estado detallado de dependencias."""
 
 
 class OpportunityListItem(Dict[str, Any]):
-    """(docs-only) item para listado."""
+    """Elemento documental del listado de oportunidades."""
 
 
 class OpportunitiesResponse(Dict[str, Any]):
-    """(docs-only) respuesta de listado."""
+    """Respuesta documental del endpoint de listado de oportunidades."""
 
 
 class QualifyEnvelopeResponse(Dict[str, Any]):
-    """(docs-only) respuesta envelope para qualify."""
+    """Respuesta documental del endpoint de cualificación."""
 
 
 class TechnicalDecisionRequest(BaseModel):
-    """Payload usado por ingeniería para registrar una decisión GO o NO GO."""
+    """Solicitud para registrar una decisión técnica sobre una oportunidad."""
     decision: str
     comment: Optional[str] = None
 
 
-# -------------------------
-# Helpers error mapping (tipo SOC)
-# -------------------------
 
 def _classify_error(e: Exception) -> Dict[str, str]:
     msg = str(e)
@@ -115,10 +108,6 @@ def _agent_status_from_trace(trace: List[str], agent_key: str) -> str:
     return "skipped"
 
 
-# -------------------------
-# Routes
-# -------------------------
-
 @router.get(
     "/health",
     summary="Health check del sistema",
@@ -127,24 +116,18 @@ def _agent_status_from_trace(trace: List[str], agent_key: str) -> str:
     },
 )
 def health_check():
-    """
-    Health check estilo SOC:
-    - estado general
-    - timestamp
-    - número de oportunidades procesadas
-    - estado de configuración de APIs
-    """
+    """Devuelve el estado general del servicio y de sus dependencias principales."""
     config_status = validate_config_on_startup()
 
     api_configuration = {
-        "openai": "✅ Configurada" if getattr(config, "OPENAI_API_KEY", None) else "❌ Falta",
-        "tavily": "✅ Configurada" if getattr(config, "TAVILY_API_KEY", None) else "❌ Falta",
-        "gmail_credentials": "✅ Configurada" if getattr(config, "GMAIL_CREDENTIALS_FILE", None) else "❌ Falta)",
-        "gmail auth": "✅ Configurada" if getattr(config, 'GMAIL_TOKEN_FILE', None) else "❌ FALTA",
-        "database": "✅ Configurada" if getattr(config, 'DATABASE_URL', None) else "❌ FALTA"
+        "openai": "configurada" if getattr(config, "OPENAI_API_KEY", None) else "no configurada",
+        "tavily": "configurada" if getattr(config, "TAVILY_API_KEY", None) else "no configurada",
+        "gmail_credentials": "configurada" if getattr(config, "GMAIL_CREDENTIALS_FILE", None) else "no configurada",
+        "gmail_auth": "configurada" if getattr(config, 'GMAIL_TOKEN_FILE', None) else "no configurada",
+        "database": "configurada" if getattr(config, 'DATABASE_URL', None) else "no configurada"
     }
 
-    missing = [k for k, v in api_configuration.items() if "❌" in v and "(opcional)" not in v]
+    missing = [k for k, v in api_configuration.items() if v == "no configurada"]
 
     overall = "healthy"
     if missing or not config_status["configured"]:
@@ -166,9 +149,7 @@ def health_check():
     responses={200: {"description": "Estado detallado de APIs"}},
 )
 def api_status():
-    """
-    Similar al SOC: describe qué APIs existen, si están configuradas y si son requeridas.
-    """
+    """Describe el estado de las dependencias externas utilizadas por la plataforma."""
     return {
         "timestamp": datetime.now().isoformat(),
         "apis": {
@@ -180,7 +161,7 @@ def api_status():
             "tavily": {
                 "configured": bool(getattr(config, "TAVILY_API_KEY", None)),
                 "description": "Búsqueda web para enriquecer contexto del cliente.",
-                "required": False,  # en MVP puedes hacerlo opcional
+                "required": False,
                 "notes": "Si falta, el agente MEDDICC no usará búsqueda web.",
             },
             "gmail": {
@@ -199,9 +180,7 @@ def api_status():
     responses={200: {"description": "Listado de oportunidades"}},
 )
 def get_opportunities(current_user=Depends(require_sales_or_engineering())):
-    """
-    Lista todas las oportunidades procesadas (persistidas en Postgres).
-    """
+    """Lista las oportunidades procesadas y filtra el acceso según el rol del usuario."""
     opps = list_opportunity_qualifications(limit=2000, offset=0)
     user_id = str(current_user.get("id"))
 
@@ -223,7 +202,7 @@ def get_opportunities(current_user=Depends(require_sales_or_engineering())):
                 filtered.append(o)
         opps = filtered
     else:
-        # Si tiene ambas capacidades, ve su cartera de ventas y técnica asignada.
+        # Si el usuario combina funciones comerciales y técnicas, se integran ambos ámbitos de visibilidad.
         filtered = []
         for o in opps:
             creator_id = str(o.get("created_by_user_id") or "")
@@ -238,7 +217,7 @@ def get_opportunities(current_user=Depends(require_sales_or_engineering())):
                 if creator and str(creator.get("engineering_manager_id") or "") == user_id:
                     filtered.append(o)
         opps = filtered
-    # Enriquecimiento para UI: nombre/apellidos de quien emitió la decisión técnica.
+    # Añade el nombre del usuario que registró la decisión técnica para mostrarlo en la interfaz.
     decision_user_cache: Dict[str, str] = {}
     for o in opps:
         decision_id = str(o.get("technical_decision_by_user_id") or "").strip()
@@ -322,15 +301,11 @@ def qualify_opportunity(
     run_workflow=Depends(get_workflow_runner),
     current_user=Depends(require_sales()),
 ):
-    """
-    Procesa la oportunidad con tu workflow LangGraph.
-    """
+    """Ejecuta el proceso completo de cualificación y devuelve su resultado consolidado."""
     try:
-        
-        # ID único
+
         opportunity_id = f"OPP-{datetime.now().strftime('%Y%m%d%H%M%S')}-{str(uuid.uuid4())[:6]}"
 
-        # Ejecutar workflow
         opp_json = req.opportunity.model_dump(mode="json")
 
         engineering_user = None
@@ -349,7 +324,7 @@ def qualify_opportunity(
             recipients={"to": list(dict.fromkeys(recipients_to)), "cc": []},
         )
 
-        # Si tu workflow devuelve status=error (como en el ejemplo que te propuse)
+        # Si el workflow informa de error funcional, se devuelve como respuesta controlada.
         if isinstance(result, dict) and result.get("status") == "error":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -361,12 +336,9 @@ def qualify_opportunity(
                 },
             )
 
-        # Normalizamos para response_model si el workflow ya devuelve Pydantic dumps
-        # Esperamos: meddicc_report y scoring
         meddicc_report = result.get("meddicc_report")
         scoring = result.get("scoring")
 
-        # Validación fuerte con schemas (si vienen como dict)
         meddicc_obj = MeddiccReport.model_validate(meddicc_report)
         scoring_obj = ScoringSummary.model_validate(scoring)
 
@@ -398,7 +370,7 @@ def qualify_opportunity(
             "_workflow_agent_execution": agent_execution,
         }
 
-        
+
         persisted_ts = datetime.now()
         save_opportunity_qualification(
             opportunity_id=opportunity_id,
@@ -435,7 +407,6 @@ def qualify_opportunity(
         return jsonable_encoder(payload)
 
     except HTTPException:
-        # ya viene estructurado
         raise
 
     except Exception as e:

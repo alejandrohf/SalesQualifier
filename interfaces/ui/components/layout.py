@@ -1,6 +1,5 @@
 """Sistema visual compartido de la interfaz Streamlit: estilos, cabeceras y componentes de layout."""
 
-# interfaces/ui/components/layout.py
 from __future__ import annotations
 
 import html

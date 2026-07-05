@@ -1,6 +1,5 @@
 """Inicialización perezosa de herramientas Gmail para el agente de notificaciones."""
 
-# tools/gmail.py
 from __future__ import annotations
 
 from langchain_community.agent_toolkits import GmailToolkit
@@ -25,6 +24,6 @@ try:
 
     gmail_toolkit = GmailToolkit(api_resource=build_resource_service(credentials=creds))
     gmail_tools = gmail_toolkit.get_tools()
-except Exception as exc:  # pragma: no cover - depende del entorno
+except Exception as exc:
     gmail_init_error = str(exc)
     gmail_tools = []

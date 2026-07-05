@@ -1,6 +1,5 @@
 """Funciones de renderizado reutilizable para resultados, errores y KPIs en Streamlit."""
 
-# interfaces/ui/components/render.py
 from __future__ import annotations
 
 from typing import Any, Dict, List
@@ -15,14 +14,12 @@ def show_api_error(e: Exception):
             st.write(getattr(e, "detail"))
 
 def show_envelope_result(result: Dict[str, Any]):
-    """
-    Renderiza la respuesta estilo envelope de /api/qualify.
-    """
+    """Muestra el resultado devuelto por el endpoint de cualificación."""
     status = result.get("status")
     if status == "success":
         st.success(result.get("message", "Procesado correctamente"))
     else:
-        st.warning("Respuesta recibida, pero no es 'success'")
+        st.warning("La API ha respondido sin marcar el proceso como satisfactorio.")
 
     cols = st.columns(3)
     cols[0].metric("Status", str(status))
@@ -32,11 +29,11 @@ def show_envelope_result(result: Dict[str, Any]):
     st.divider()
 
     if "trace" in result and result["trace"]:
-        with st.expander("🧵 Trace del workflow", expanded=False):
+        with st.expander("Trazabilidad del workflow", expanded=False):
             st.write(result["trace"])
 
     if "result" in result and result["result"]:
-        st.subheader("📦 Resultado")
+        st.subheader("Resultado")
         st.json(result["result"], expanded=False)
     else:
         st.info("No hay campo 'result' en la respuesta.")
@@ -76,26 +73,20 @@ def json_expander(title: str, data: Any, expanded: bool = False):
 
 
 def kpi_row(items: List[Dict[str, Any]]):
-    """
-    items = [{"label": "...", "value": "...", "help": "..."}]
-    """
+    """Renderiza una fila de indicadores a partir de una lista de elementos."""
     cols = st.columns(len(items))
     for col, it in zip(cols, items):
         col.metric(label=it.get("label", ""), value=it.get("value", ""), help=it.get("help"))
 
 
 def render_reference_matches(result_obj: Dict[str, Any]):
-    """
-    result_obj = el objeto 'result' devuelto por /api/qualify (QualifyResponse serializado)
-    Espera:
-      result_obj["reference_matches"] = { "matches": [...], "bonus_applied": ... }
-    """
+    """Representa las referencias semánticas devueltas en el resultado de cualificación."""
     refs = result_obj.get("reference_matches")
     if not refs:
         st.info("No se han encontrado referencias similares (RAG).")
         return
 
-    st.subheader("📚 Referencias similares (RAG Top-5)")
+    st.subheader("Referencias similares")
     st.caption(f"Bonus aplicado al scoring: {refs.get('bonus_applied', 0.0)}")
 
     matches = refs.get("matches", [])

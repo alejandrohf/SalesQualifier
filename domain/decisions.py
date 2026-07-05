@@ -1,14 +1,4 @@
-# domain/decisions.py
-"""
-Decisiones deterministas separadas para reutilización.
-
-Nota: En tu scoring.py ya existen determine_qualification_level y
-determine_recommended_action. Este módulo es útil si quieres centralizar
-políticas y evitar duplicidad en el futuro.
-
-Si decides centralizar, en scoring.py podrías importar estas funciones
-en lugar de redefinirlas.
-"""
+"""Reglas de decisión derivadas del scoring final de una oportunidad."""
 
 from __future__ import annotations
 

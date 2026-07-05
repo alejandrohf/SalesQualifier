@@ -1,6 +1,5 @@
 """Base declarativa compartida por todos los modelos ORM del proyecto."""
 
-# infrastructure/db/base.py
 from __future__ import annotations
 
 from sqlalchemy.orm import DeclarativeBase

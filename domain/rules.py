@@ -1,16 +1,11 @@
-# domain/rules.py
 """
-Reglas deterministas (Plain Concepts) para:
+Reglas deterministas para:
 - Derivar StrategicFlags (penalizaciones/bonus) usados en scoring.py
 - Derivar has_critical_risk para modular recommended_action
 
 Estas reglas NO usan LLM. Se basan en:
 - Input estructurado de la oportunidad (formulario)
 - Resultado estructurado MEDDICC (JSON -> Pydantic)
-
-Importante:
-- Ajusta los accesos a campos según tu schema real de OpportunityInput.
-- Mantén estas reglas simples, explicables y testeables.
 """
 
 from __future__ import annotations
@@ -21,7 +16,7 @@ from domain.scoring import StrategicFlags
 
 
 # ------------------------------------------------------------------------------
-# Accesores robustos (para evitar acoplarte demasiado al schema durante el MVP)
+# Accesores auxiliares
 # ------------------------------------------------------------------------------
 
 def _get(obj: Any, *paths: str, default: Any = None) -> Any:
@@ -106,7 +101,7 @@ def _collaboration_type(opportunity: Any) -> str:
 
 def _is_rfp(opportunity: Any) -> bool:
     ct = _collaboration_type(opportunity)
-    return ("rfp" in ct) or ("licit" in ct) or ("tender" in ct)
+    return ("rfp" in ct) or ("rfi" in ct) or ("licit" in ct) or ("tender" in ct)
 
 
 def _is_fixed_price(opportunity: Any) -> bool:
@@ -116,9 +111,8 @@ def _is_fixed_price(opportunity: Any) -> bool:
 
 def _is_scope_defined(opportunity: Any) -> bool:
     """
-    Heurística de 'scope definido' para evitar fixed-price suicidas.
-
-    Criterio MVP (defendible):
+    Heurística de 'scope definido' para evitar fixed-price con riesgo.
+    Criterio:
     - descripción >= 80 chars
     - existe due_date o fecha objetivo
     - existe tamaño estimado
@@ -136,14 +130,13 @@ def _is_scope_defined(opportunity: Any) -> bool:
 
 
 def _is_strategic_vertical(opportunity: Any) -> bool:
-    """
-    Bonus si la oportunidad pertenece a una vertical estratégica.
+    """Detecta si la oportunidad encaja en una vertical considerada estratégica por la organización.
 
-    Para MVP, usa 'main_area/area' y considera estratégicos:
-    Data/IA, Modernización apps, Cloud/Infra.
+    La clasificación actual se apoya en palabras clave del área principal y puede
+    refinarse si la taxonomía comercial evoluciona.
     """
     area = _norm_str(_get(opportunity, "main_area", "area", "area_principal", default=""))
-    strategic_markers = ("data", "ia", "ai", "analytics", "modern", "cloud", "infra", "fabric", "copilot")
+    strategic_markers = ("data", "ia", "ai", "analytics", "modern", "cloud", "agent", "snowflake", "databricks", "fabric", "copilot")
     return any(m in area for m in strategic_markers)
 
 
@@ -182,15 +175,14 @@ def derive_has_critical_risk(opportunity: Any, meddicc_report: Any) -> bool:
     """
     Determina si existe un riesgo crítico que debería influir recommended_action.
 
-    Regla MVP (simple, explicable y alineada con scoring.py):
+    Regla operativa alineada con el motor de scoring:
     - decision_process insuficiente -> riesgo crítico
     - economic_buyer insuficiente -> riesgo crítico
     - RFP sin acceso a EB -> riesgo crítico
     - fixed price sin scope -> riesgo crítico
 
-    Nota:
-    - Esto está alineado con las penalizaciones, pero sirve como "gate"
-      para evitar recomendar invertir preventa aunque el score sea alto.
+    Esta comprobación complementa las penalizaciones del scoring para evitar
+    recomendaciones excesivamente optimistas cuando faltan condiciones críticas.
     """
     # decision_process insuficiente
     dp = _get(_get(meddicc_report, "meddicc", default={}), "decision_process", default={})

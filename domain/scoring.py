@@ -1,16 +1,7 @@
-# domain/scoring.py
-"""
-Scoring determinista para oportunidades cualificadas con MEDDICC.
-El motor matemático y de reglas que transforma el análisis MEDDICC en score final y recomendación.
+"""Motor de scoring determinista para oportunidades evaluadas con MEDDICC.
 
-Objetivos:
-- Validar rangos por dimensión (evitar scores inválidos del LLM).
-- Calcular total_score (0-10) y nivel de cualificación.
-- Aplicar ajustes estratégicos (Plain Concepts) de forma trazable y testeable.
-
-Nota:
-- Este módulo NO depende de LangChain, FastAPI ni Streamlit.
-- Es 100% determinista y fácil de testear con pytest.
+Este módulo valida las puntuaciones por dimensión, calcula la nota final y
+aplica ajustes estratégicos de forma trazable y testeable.
 """
 
 from __future__ import annotations
@@ -51,11 +42,11 @@ THRESHOLDS = {
     "medium": 6.0,
 }
 
-# Ajustes estratégicos (Plain Concepts)
+# Ajustes estratégicos aplicados sobre la puntuación base.
 ADJUSTMENTS = {
     "new_client_no_strong_champion": -0.5,   # Nuevo cliente sin champion fuerte
     "fixed_price_without_scope": -0.5,       # Fixed price sin scope definido
-    "rfp_no_access_to_economic_buyer": -1.0, # RFP sin acceso a EB
+    "rfp_no_access_to_economic_buyer": -1.0, # RFP sin acceso al decisor económico
     "strategic_vertical": 0.5,               # Vertical estratégica
     "references_bonus": 0.0,                 # Bonus por referencias encontradas (valor dinámico)
 }
@@ -75,10 +66,7 @@ class ScoringError(ValueError):
 
 @dataclass(frozen=True)
 class StrategicFlags:
-    """
-    Flags booleanos para ajustes estratégicos.
-    Se derivan del input de la oportunidad + análisis MEDDICC.
-    """
+    """Indicadores de negocio que modifican el resultado base del scoring."""
     # Penalizaciones
     new_client_no_strong_champion: bool = False
     fixed_price_without_scope: bool = False
@@ -103,7 +91,7 @@ def validate_dimension_scores(dimension_scores: Dict[Dimension, float]) -> None:
     if unknown:
         raise ScoringError(f"Dimensiones desconocidas: {sorted(unknown)}")
 
-    # 2) Validar que estén todas (opcional, pero recomendable)
+    # 2) Validar que estén todas las dimensiones esperadas.
     missing = set(MAX_SCORES.keys()) - set(dimension_scores.keys())
     if missing:
         raise ScoringError(f"Faltan dimensiones: {sorted(missing)}")
@@ -118,17 +106,13 @@ def validate_dimension_scores(dimension_scores: Dict[Dimension, float]) -> None:
 
 
 def calculate_total_score(dimension_scores: Dict[Dimension, float]) -> float:
-    """
-    Suma scores por dimensión y devuelve total (0–10) sin ajustes estratégicos.
-    """
+    """Suma las puntuaciones por dimensión y devuelve la nota base sobre diez."""
     validate_dimension_scores(dimension_scores)
     return round(sum(dimension_scores.values()), 2)
 
 
 def determine_qualification_level(total_score: float) -> QualificationLevel:
-    """
-    Determina nivel de cualificación según thresholds.
-    """
+    """Determina el nivel de cualificación asociado a la puntuación final."""
     if total_score >= THRESHOLDS["high"]:
         return "high"
     if total_score >= THRESHOLDS["medium"]:
@@ -137,19 +121,14 @@ def determine_qualification_level(total_score: float) -> QualificationLevel:
 
 
 # ----------------------------
-# Ajustes estratégicos (Plain Concepts)
+# Ajustes estratégicos
 # ----------------------------
 
 def apply_strategic_adjustments(
     base_total_score: float,
     flags: StrategicFlags,
 ) -> Tuple[float, Dict[str, float]]:
-    """
-    Aplica ajustes estratégicos al score base.
-    Devuelve:
-      - adjusted_score (clamped 0–10)
-      - breakdown de ajustes aplicados (para auditoría y explicabilidad)
-    """
+    """Aplica ajustes estratégicos al score base y devuelve la nota ajustada con su desglose."""
     breakdown: Dict[str, float] = {}
     adjustment_sum = 0.0
 
@@ -175,7 +154,7 @@ def apply_strategic_adjustments(
 
     adjusted = round(base_total_score + adjustment_sum, 2)
 
-    # Clamp a [0, 10]
+    # Limita el resultado al rango valido de la escala.
     adjusted = max(0.0, min(10.0, adjusted))
     return adjusted, breakdown
 
@@ -188,12 +167,7 @@ def determine_recommended_action(
     qualification_level: QualificationLevel,
     has_critical_risk: bool = False,
 ) -> RecommendedAction:
-    """
-    Recomendación operativa:
-    - high sin riesgos críticos -> invertir preventa
-    - medium -> pedir más info (discovery) antes de comprometer recursos
-    - low o high con riesgo crítico -> no priorizar (o pedir info si quieres ser más laxo)
-    """
+    """Selecciona la acción comercial recomendada a partir del nivel y del riesgo crítico."""
     if qualification_level == "high" and not has_critical_risk:
         return "invest_pre_sales"
     if qualification_level == "medium":
@@ -202,7 +176,7 @@ def determine_recommended_action(
 
 
 # ----------------------------
-# API principal (para supervisor/workflow)
+# Función principal utilizada por el supervisor del workflow.
 # ----------------------------
 
 def build_scoring_summary(
@@ -211,22 +185,13 @@ def build_scoring_summary(
     has_critical_risk: bool = False,
     reference_bonus: float = 0.0,
 ) -> Dict[str, object]:
-    """
-    Calcula:
-      - base_total_score
-      - adjusted_total_score (si flags)
-      - qualification_level sobre adjusted_total_score
-      - recommended_action
-      - breakdown de ajustes (para auditoría)
-
-    Devuelve un dict listo para mapear a tu Summary Pydantic.
-    """
+    """Construye el resumen final del scoring listo para su serialización y consumo por la API."""
     flags = flags or StrategicFlags()
 
     base_total = calculate_total_score(dimension_scores)
     adjusted_total, adjustments_breakdown = apply_strategic_adjustments(base_total, flags)
 
-    # clamp reference bonus [0..0.5] y lo aplicamos
+    # Calcula un bonus acotado según el número y la calidad de las referencias recuperadas.
     reference_bonus = max(0.0, min(0.5, round(float(reference_bonus), 2)))
     if reference_bonus > 0:
         adjustments_breakdown["references_bonus"] = reference_bonus

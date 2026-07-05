@@ -1,6 +1,5 @@
 """Definición del estado compartido usado por el grafo LangGraph del workflow."""
 
-# workflows/state.py
 from __future__ import annotations
 from typing import Any, Dict, List, Literal, Optional, TypedDict
 from langchain_core.messages import BaseMessage
@@ -15,48 +14,44 @@ WorkflowStatus = Literal[
 
 
 class WorkflowState(TypedDict, total=False):
-    """
-    Estado compartido del grafo LangGraph.
-    Nota: usamos TypedDict para evitar acoplarlo a Pydantic.
-    Pydantic lo reservamos para schemas (contracts).
-    """
+    """Estado compartido entre los nodos del workflow de cualificación."""
 
-    # Mensajería (útil si quieres trazar historial LLM)
+    # Mensajes intercambiados durante la ejecución del workflow.
     messages: List[BaseMessage]
 
-    # Control
+    # Control general de ejecución.
     status: WorkflowStatus
     error: Optional[str]
 
-    # Input principal
+    # Datos de entrada y destinatarios asociados.
     opportunity: Any
     recipients: Dict[str, List[str]]  # {"to": [...], "cc": [...]}
     agent_errors: List[Dict[str, Any]]
 
-    # Outputs LLM
+    # Resultados producidos por los agentes del workflow.
     client_website_summary_raw: Optional[str]  # JSON del client_website_analyzer
     client_website_summary: Optional[Dict[str, Any]]
-    meddicc_report_raw: Optional[str]          # JSON string devuelto por opportunity_analyzer
-    meddicc_report: Optional[Any]              # MeddiccReport (Pydantic)
-    risk_report: Optional[str]                 # texto del risk_analyzer (si lo ejecutas)
-    delivery_fit_report: Optional[str]         # texto del delivery_fit_analyzer
-    commercial_fit_report: Optional[str]       # texto del commercial_fit_analyzer
+    meddicc_report_raw: Optional[str]          # Respuesta JSON serializada devuelta por opportunity_analyzer.
+    meddicc_report: Optional[Any]              # Informe MEDDICC validado.
+    risk_report: Optional[str]                 # Informe textual de riesgos.
+    delivery_fit_report: Optional[str]         # Evaluación de encaje de entrega.
+    commercial_fit_report: Optional[str]       # Evaluación de encaje comercial.
 
-    # Dominio (determinista)
+    # Resultados del análisis determinista.
     dimension_scores: Optional[Dict[str, float]]
-    strategic_flags: Optional[Any]             # StrategicFlags (dataclass)
+    strategic_flags: Optional[Any]             # Indicadores estratégicos derivados de la oportunidad.
     has_critical_risk: Optional[bool]
-    scoring: Optional[Any]                     # dict output build_scoring_summary(...)
-    scoring_summary: Optional[Any]             # ScoringSummary (Pydantic) si lo usas
+    scoring: Optional[Any]                     # Resultado serializable del scoring final.
+    scoring_summary: Optional[Any]             # Resumen tipado del scoring.
 
-    # Notificación
-    notification_payload_raw: Optional[str]    # JSON (to/cc/subject/html_body/priority)
-    notification_payload: Optional[Any]        # EmailNotification (Pydantic)
-    notification_result: Optional[str]         # mensaje/estado del envío
+    # Datos preparados para la notificación final.
+    notification_payload_raw: Optional[str]    # Respuesta JSON serializada del agente de notificación.
+    notification_payload: Optional[Any]        # Notificación validada antes del envío.
+    notification_result: Optional[str]         # Resultado del envío o de su simulación.
 
-    # Observabilidad
-    trace: List[str]                           # pasos ejecutados (debug)
+    # Trazabilidad de la ejecución.
+    trace: List[str]                           # Secuencia de pasos ejecutados.
     
-    # RAG references
+    # Referencias recuperadas mediante búsqueda semántica.
     reference_matches: Optional[ReferenceMatchesReport]
     reference_bonus: float

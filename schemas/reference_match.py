@@ -1,6 +1,5 @@
 """Schemas del resultado de recuperación semántica de referencias similares."""
 
-# schemas/reference_match.py
 from __future__ import annotations
 
 from typing import List

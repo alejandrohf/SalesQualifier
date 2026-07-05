@@ -1,6 +1,5 @@
 """Endpoints para gestionar el catálogo de referencias y su búsqueda semántica."""
 
-# interfaces/api/routes_references.py
 from __future__ import annotations
 
 from typing import Any, Dict

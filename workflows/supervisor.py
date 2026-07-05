@@ -4,7 +4,6 @@ Orquesta la ejecución de agentes, aplica reglas deterministas, coordina la
 recuperación de referencias y prepara la notificación final.
 """
 
-# workflows/supervisor.py
 from __future__ import annotations
 
 import json
@@ -16,7 +15,6 @@ from typing import Any, cast
 from fastapi.encoders import jsonable_encoder
 from langgraph.graph import END, START, StateGraph
 
-# Agents
 from agents import (
     client_website_analyzer,
     commercial_fit_analyzer,
@@ -27,20 +25,18 @@ from agents import (
     risk_analyzer,
 )
 
-# Domain (determinista)
 from domain.rules import derive_has_critical_risk, derive_strategic_flags
 from domain.scoring import Dimension, ScoringError, build_scoring_summary
 from schemas.meddicc import MeddiccReport
 from schemas.notifications import EmailNotification
 
-# Schemas
 from schemas.opportunity import OpportunityInput
 from schemas.reference_match import ReferenceMatchesReport
 from schemas.scoring import ScoringSummary
 from tools.vectorstore import search_references
 from workflows.state import WorkflowState
 
-# Timeouts por nodo (segundos). Ajustables por env vars.
+# Tiempos máximos de ejecución por nodo, configurables mediante variables de entorno.
 MEDDICC_TIMEOUT_S = int(os.getenv("SQA_MEDDICC_TIMEOUT_S", "120"))
 CLIENT_WEBSITE_TIMEOUT_S = int(os.getenv("SQA_CLIENT_WEBSITE_TIMEOUT_S", "45"))
 REFERENCES_TIMEOUT_S = int(os.getenv("SQA_REFERENCES_TIMEOUT_S", "60"))
@@ -51,10 +47,6 @@ NOTIFICATION_TIMEOUT_S = int(os.getenv("SQA_NOTIFICATION_TIMEOUT_S", "90"))
 DOCUMENT_BASE_URL = os.getenv("SQA_API_BASE_URL", "http://localhost:8000")
 
 
-# ---------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------
-
 def _append_trace(state: WorkflowState, msg: str) -> None:
     trace = state.get("trace") or []
     trace.append(msg)
@@ -62,9 +54,7 @@ def _append_trace(state: WorkflowState, msg: str) -> None:
 
 
 def _invoke_agent_with_timeout(agent: Any, payload: dict[str, Any], timeout_s: int, label: str) -> Any:
-    """
-    Invoca agent.invoke con timeout duro para evitar bloquear toda la API.
-    """
+    """Ejecuta un agente con un tiempo máximo para proteger la disponibilidad de la API."""
     with ThreadPoolExecutor(max_workers=1) as pool:
         fut = pool.submit(agent.invoke, payload)
         try:
@@ -74,15 +64,12 @@ def _invoke_agent_with_timeout(agent: Any, payload: dict[str, Any], timeout_s: i
             raise TimeoutError(f"{label} timed out after {timeout_s}s") from e
 
 def _safe_json_loads(raw: str) -> Any:
-    """
-    Parsea JSON aunque venga con whitespace extraño.
-    Si el LLM devuelve texto no-JSON, esto fallará -> lo capturamos en nodo.
-    """
+    """Intenta interpretar una respuesta JSON aunque incluya texto adicional alrededor."""
     text = (raw or "").strip()
     try:
         return json.loads(text)
     except Exception:
-        # Fallback robusto: extrae el primer objeto JSON válido dentro del texto.
+        # Busca el primer objeto JSON válido cuando la respuesta incluye texto accesorio.
         decoder = json.JSONDecoder()
         for i, ch in enumerate(text):
             if ch != "{":
@@ -96,9 +83,7 @@ def _safe_json_loads(raw: str) -> Any:
 
 
 def _normalize_meddicc_payload(data: Any) -> Any:
-    """
-    Normaliza campos del payload MEDDICC que suelen venir fuera de rango desde LLM.
-    """
+    """Ajusta valores del informe MEDDICC antes de validarlos contra el esquema."""
     if not isinstance(data, dict):
         return data
 
@@ -113,9 +98,7 @@ def _normalize_meddicc_payload(data: Any) -> Any:
     return data
 
 def _build_dimension_scores(report: MeddiccReport) -> dict[Dimension, float]:
-    """
-    Extrae los scores por dimensión desde MeddiccReport (LLM).
-    """
+    """Extrae las puntuaciones por dimensión desde el informe MEDDICC validado."""
     return cast(dict[Dimension, float], {
         "metrics": report.meddicc.metrics.score,
         "economic_buyer": report.meddicc.economic_buyer.score,
@@ -127,11 +110,7 @@ def _build_dimension_scores(report: MeddiccReport) -> dict[Dimension, float]:
     })
 
 def _should_run_deep_analysis(state: WorkflowState) -> str:
-    """
-    Router condicional:
-    - Si recommended_action es invest_pre_sales o request_more_info → ejecutar análisis extra
-    - Si do_not_prioritize → saltar a notificación
-    """
+    """Decide si la oportunidad requiere análisis adicionales o pasa directamente a notificación."""
     scoring = state.get("scoring") or {}
     action = scoring.get("recommended_action")
 
@@ -144,9 +123,7 @@ def _route_stop_if_error(state: WorkflowState) -> str:
 
 
 def _compute_reference_bonus(similarities: list[float]) -> float:
-    """
-    Bonus determinista [0.0..0.5] basado en calidad/cantidad de referencias.
-    """
+    """Calcula un bonus acotado según la similitud de las referencias recuperadas."""
     if not similarities:
         return 0.0
 
@@ -184,9 +161,7 @@ def _build_reference_query(opportunity: Any) -> str:
 
 
 def _fallback_reference_matches_report(state: WorkflowState) -> ReferenceMatchesReport | None:
-    """
-    Fallback determinista: usa directamente search_references para no depender de salida JSON del LLM.
-    """
+    """Genera coincidencias de referencias sin depender de una respuesta estructurada del agente."""
     opportunity = state.get("opportunity")
     if opportunity is None:
         return None
@@ -251,10 +226,6 @@ def _build_opportunity_context_for_email(opportunity: Any) -> dict[str, Any]:
         "notes": _val("notes"),
     }
 
-# ---------------------------------------------------------------------
-# Nodes
-# ---------------------------------------------------------------------
-
 def node_meddicc_analyze(state: WorkflowState) -> WorkflowState:
     """
     Ejecuta opportunity_analyzer y guarda el JSON raw devuelto.
@@ -268,8 +239,7 @@ def node_meddicc_analyze(state: WorkflowState) -> WorkflowState:
         state["error"] = "Missing opportunity in state"
         return state
 
-    # Convertimos el input a texto que el agente pueda consumir.
-    # Puedes pasarle JSON del OpportunityInput para máxima fidelidad.
+    # Convierte la oportunidad a un formato textual adecuado para el agente.
     if hasattr(opportunity, "model_dump"):
         payload = opportunity.model_dump(mode="json")
     elif isinstance(opportunity, dict):
@@ -302,7 +272,7 @@ INSTRUCCIÓN:
         _append_trace(state, f"node_meddicc_analyze:timeout {e}")
         return state
 
-    # LangGraph agents suelen devolver dict con messages; tomamos el último contenido
+    # Toma el último mensaje generado por el agente cuando la respuesta llega en formato conversacional.
     raw = None
     if isinstance(result, dict) and "messages" in result and result["messages"]:
         raw = result["messages"][-1].content  # type: ignore[attr-defined]
@@ -405,7 +375,7 @@ def node_run_references_match(state: WorkflowState) -> WorkflowState:
     opp_json = jsonable_encoder(opportunity)
     meddicc_json = jsonable_encoder(report.summary) if report else {}
 
-    # IMPORTANTE: base URL para construir links de descarga
+    # Base URL usada para construir enlaces de descarga de documentos.
     document_base_url = DOCUMENT_BASE_URL
 
     prompt_input = f"""OPPORTUNITY_JSON:
@@ -471,7 +441,7 @@ def node_parse_references_match(state: WorkflowState) -> WorkflowState:
         sims = [m.similarity for m in report.matches]
         bonus = _compute_reference_bonus(sims)
 
-        # fija bonus determinista
+        # Actualiza el bonus calculado a partir de las similitudes recuperadas.
         report.bonus_applied = bonus
 
         state["reference_matches"] = report
@@ -511,7 +481,7 @@ def node_domain_rules_and_scoring(state: WorkflowState) -> WorkflowState:
         state["error"] = "Missing opportunity or meddicc_report"
         return state
 
-    # Asegura OpportunityInput (si viene dict desde API)
+    # Convierte la entrada a OpportunityInput cuando procede de la API como diccionario.
     if isinstance(opportunity, dict):
         opportunity_obj = OpportunityInput.model_validate(opportunity)
         state["opportunity"] = opportunity_obj
@@ -519,7 +489,7 @@ def node_domain_rules_and_scoring(state: WorkflowState) -> WorkflowState:
 
     try:
         dimension_scores = _build_dimension_scores(cast(MeddiccReport, report))
-        flags = derive_strategic_flags(opportunity, report)  # domain/rules.py (robusto)
+        flags = derive_strategic_flags(opportunity, report)
         has_critical_risk = derive_has_critical_risk(opportunity, report)
 
         scoring = build_scoring_summary(
@@ -534,7 +504,7 @@ def node_domain_rules_and_scoring(state: WorkflowState) -> WorkflowState:
         state["has_critical_risk"] = has_critical_risk
         state["scoring"] = scoring
 
-        # (Opcional) valida a schema de scoring
+        # Valida el resultado final con el esquema de scoring.
         scoring_summary = ScoringSummary.model_validate({
             "base_total_score": scoring["base_total_score"],
             "total_score": scoring["total_score"],
@@ -758,9 +728,9 @@ INSTRUCCIÓN:
             data = _safe_json_loads(output)
             payload = EmailNotification.model_validate(data)
             state["notification_payload"] = payload
-            state["notification_result"] = "prepared"  # o "sent" si tu agente realmente envía
+            state["notification_result"] = "prepared"
         except Exception:
-            # Si no era JSON, asumimos que fue un resultado de envío o texto
+            # Si la salida no es JSON, se conserva como resultado textual del agente.
             state["notification_result"] = output
     else:
         state["notification_result"] = output
@@ -769,10 +739,6 @@ INSTRUCCIÓN:
     state["status"] = "completed"
     return state
 
-
-# ---------------------------------------------------------------------
-# Build workflow
-# ---------------------------------------------------------------------
 
 def build_sales_qualification_workflow():
     """
@@ -794,7 +760,6 @@ def build_sales_qualification_workflow():
 
     graph.add_node("notify", node_prepare_and_send_notification)
 
-    # Flow base
     graph.add_edge(START, "client_website_context")
     graph.add_edge("client_website_context", "meddicc_analyze")
     graph.add_edge("meddicc_analyze", "parse_meddicc")
@@ -810,7 +775,6 @@ def build_sales_qualification_workflow():
     graph.add_edge("references_match", "parse_references_match")
     graph.add_edge("parse_references_match", "domain_scoring")
 
-    # Routing condicional a deep analysis o notificación directa
     graph.add_conditional_edges(
         "domain_scoring",
         _should_run_deep_analysis,
@@ -820,7 +784,6 @@ def build_sales_qualification_workflow():
         },
     )
 
-    # Deep analysis chain (secuencial)
     graph.add_edge("risk", "delivery_fit")
     graph.add_edge("delivery_fit", "commercial_fit")
     graph.add_edge("commercial_fit", "notify")
@@ -830,7 +793,6 @@ def build_sales_qualification_workflow():
     return graph.compile()
 
 
-# Instancia global
 sales_qualification_workflow = build_sales_qualification_workflow()
 
 
@@ -838,10 +800,7 @@ def process_opportunity(
     opportunity: OpportunityInput | dict[str, Any],
     recipients: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
-    """
-    Entry-point cómodo (similar al process_security_alert del SOC).
-    Devuelve un dict con todo lo importante para UI/API.
-    """
+    """Ejecuta el workflow completo y devuelve una estructura serializable para la API y la interfaz."""
     init_state: WorkflowState = {
         "status": "draft",
         "opportunity": opportunity,
@@ -851,7 +810,7 @@ def process_opportunity(
 
     result = sales_qualification_workflow.invoke(init_state)
 
-    # Normalizamos salida a dict serializable
+    # Convierte la salida del workflow en una estructura directamente serializable.
     out: dict[str, Any] = {
         "status": result.get("status"),
         "error": result.get("error"),
@@ -859,7 +818,7 @@ def process_opportunity(
         "client_website_summary": result.get("client_website_summary"),
         "scoring": result.get("scoring_summary").model_dump() if result.get("scoring_summary") else result.get("scoring"),
         "meddicc_report": result.get("meddicc_report").model_dump(mode="json") if result.get("meddicc_report") else None,
-        "reference_matches": result.get("reference_matches").model_dump(mode="json") if result.get("reference_matches") else None,  # <-- NUEVO
+        "reference_matches": result.get("reference_matches").model_dump(mode="json") if result.get("reference_matches") else None,
         "risk_report": result.get("risk_report"),
         "delivery_fit_report": result.get("delivery_fit_report"),
         "commercial_fit_report": result.get("commercial_fit_report"),

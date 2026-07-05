@@ -1,6 +1,5 @@
-"""Schema del mensaje de correo preparado para la capa de notificaciones."""
+"""Esquema del mensaje de correo producido por el flujo de notificación."""
 
-# schemas/notifications.py
 from __future__ import annotations
 from typing import List, Literal
 from pydantic import BaseModel, EmailStr, Field

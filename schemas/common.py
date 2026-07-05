@@ -4,9 +4,6 @@ Centraliza literales reutilizables, el modelo base común y los metadatos de
 trazabilidad empleados por la API y los workflows.
 """
 
-# schemas/common.py
-# tipos compartidos (enums/literals, base model, helpers)
-
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -14,7 +11,6 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-# --- Literals compartidos ---
 Status = Literal["complete", "partial", "insufficient"]
 ClientContextSource = Literal["input", "web", "input+web"]
 
@@ -46,16 +42,16 @@ DecisionRole = Literal["decision_maker", "non_decision_maker", "unknown"]
 
 
 class AppBaseModel(BaseModel):
-    """Base común para todos los schemas."""
+    """Modelo base compartido por los esquemas de la aplicación."""
     model_config = ConfigDict(
-        extra="forbid",  # evita campos inesperados (muy útil con JSON de LLM)
+        extra="forbid",
         str_strip_whitespace=True,
         validate_assignment=True,
     )
 
 
 class Metadata(AppBaseModel):
-    """Metadatos genéricos para trazabilidad."""
+    """Metadatos auxiliares para trazabilidad y correlación entre procesos."""
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: Optional[str] = None
     correlation_id: Optional[str] = None

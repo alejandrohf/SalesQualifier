@@ -6,7 +6,6 @@ from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
-# OJO: version_num en alembic_version está en varchar(32) en este entorno.
 revision = "0002_opp_qualifications"
 down_revision = "0001_create_references_pgvector"
 branch_labels = None

@@ -4,7 +4,6 @@ Incluye alta de referencias, reindexación, persistencia de embeddings y
 búsqueda semántica usada por el workflow y por la API.
 """
 
-# tools/vectorstore.py
 from __future__ import annotations
 
 import hashlib
@@ -71,7 +70,6 @@ def _now():
 
 
 def _pdf_path(reference_id: UUID, version: int = 1) -> str:
-    # para MVP: un único fichero por id (si quieres versionado real, añade sufijo _v{version})
     return os.path.join(DATA_DIR, f"{reference_id}.pdf")
 
 
@@ -88,10 +86,7 @@ def _get_db() -> Session:
 # -------------------------
 
 def create_reference(meta: CustomerReferenceCreate, pdf_bytes: bytes) -> UUID:
-    """
-    1) Guarda PDF en filesystem
-    2) INSERT en customer_references
-    """
+    """Crea la referencia documental, guarda el PDF y registra sus metadatos."""
     ref_id = uuid4()
     path = _pdf_path(ref_id)
 
@@ -164,13 +159,12 @@ def replace_reference_pdf(reference_id: UUID, pdf_bytes: bytes) -> None:
         if not ref:
             raise ValueError(f"Reference not found: {reference_id}")
 
-        # sobrescribe pdf (MVP)
         with open(ref.document_path, "wb") as f:
             f.write(pdf_bytes)
 
         ref.document_version += 1
         ref.updated_at = _now()
-        ref.indexed_at = None  # obligará a reindex
+        ref.indexed_at = None
         db.commit()
 
 
@@ -181,7 +175,6 @@ def delete_reference(reference_id: UUID) -> None:
         if not ref:
             raise ValueError(f"Reference not found: {reference_id}")
 
-        # borra fichero
         try:
             if ref.document_path and os.path.exists(ref.document_path):
                 os.remove(ref.document_path)
@@ -197,15 +190,7 @@ def delete_reference(reference_id: UUID) -> None:
 # -------------------------
 
 def reindex_reference(reference_id: UUID) -> None:
-    """
-    Background task:
-      - Lee PDF
-      - Chunking
-      - Embeddings (1536)
-      - Borra embeddings previos
-      - Inserta embeddings nuevos
-      - Actualiza indexed_at
-    """
+    """Reconstruye los embeddings de una referencia a partir de su documento PDF actual."""
     with _get_db() as db:
         ref = db.get(CustomerReferenceORM, reference_id)
         if not ref:
@@ -217,7 +202,7 @@ def reindex_reference(reference_id: UUID) -> None:
     chunks = chunk_text(text)
 
     if not chunks:
-        # marca como "indexado" pero sin embeddings
+        # Si el documento no contiene texto utilizable, se actualiza igualmente la marca de indexación.
         with _get_db() as db:
             ref2 = db.get(CustomerReferenceORM, reference_id)
             if ref2:
@@ -230,10 +215,8 @@ def reindex_reference(reference_id: UUID) -> None:
     vectors = _embeddings.embed_documents(chunk_texts)
 
     with _get_db() as db:
-        # 1) delete prev embeddings
         db.execute(delete(ReferenceEmbeddingORM).where(ReferenceEmbeddingORM.reference_id == reference_id))
 
-        # 2) insert new
         for c, vec in zip(chunks, vectors):
             db.add(
                 ReferenceEmbeddingORM(
@@ -246,7 +229,6 @@ def reindex_reference(reference_id: UUID) -> None:
                 )
             )
 
-        # 3) update reference
         ref3 = db.get(CustomerReferenceORM, reference_id)
         if ref3:
             ref3.indexed_at = _now()
@@ -265,14 +247,11 @@ def search_references(
     top_k: int = 5,
     filters: Optional[ReferenceSearchFilters] = None,
 ) -> List[ReferenceSearchHit]:
-    """
-    Query → embedding → ANN over pgvector.
-    similarity = 1 - cosine_distance
-    """
+    """Ejecuta una búsqueda semántica sobre las referencias indexadas en pgvector."""
     qvec = _embeddings.embed_query(query)
 
     with _get_db() as db:
-        # cosine_distance: menor = más similar
+        # En pgvector una distancia menor implica una mayor similitud.
         similarity_expr = (1 - ReferenceEmbeddingORM.embedding.cosine_distance(qvec)).label("similarity")
 
         stmt = (
@@ -321,15 +300,12 @@ def search_references(
 # Tool wrapper (LangChain tool)
 # -------------------------
 
-from langchain.tools import tool  # keep at end to avoid import cycles
+from langchain.tools import tool
 
 
 @tool
 def vectorstore_search_references(query: str, top_k: int = 5, filters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """
-    Herramienta para agentes: consulta top_k referencias similares.
-    filters opcional: {"industry": "...", "area": "...", "cloud": "...", "size": "..."}
-    """
+    """Expone la búsqueda semántica de referencias para su uso desde agentes LangChain."""
     f = None
     if filters:
         f = ReferenceSearchFilters(

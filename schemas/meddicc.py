@@ -1,6 +1,5 @@
 """Schemas del análisis MEDDICC y del contexto enriquecido del cliente."""
 
-# schemas/meddicc.py
 from __future__ import annotations
 
 from typing import List, Optional
