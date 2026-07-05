@@ -210,26 +210,6 @@ Ejecutar la suite automatizada:
 ./venv/bin/pytest
 ```
 
-## Evidencias de código propio
-
-El desarrollo propio del proyecto se refleja de forma directa en los siguientes bloques del repositorio:
-
-- `domain/scoring.py` y `domain/rules.py`: motor de scoring determinista, penalizaciones y reglas estratégicas de cualificación.
-- `workflows/supervisor.py`: orquestación del workflow multiagente y consolidación de resultados.
-- `agents/`: agentes especializados para análisis MEDDICC, riesgos, encaje comercial, referencias y notificación.
-- `interfaces/api/`: API REST desarrollada con FastAPI, incluyendo autenticación, oportunidades, referencias y monitorización.
-- `interfaces/ui/`: dashboard y pantallas de operación desarrolladas con Streamlit.
-- `infrastructure/db/` y `migrations/`: persistencia relacional, integración con `pgvector` y evolución del esquema.
-- `tests/`: pruebas unitarias e integración ligera sobre scoring, contratos, helpers del workflow y rutas principales.
-
-En conjunto, estas carpetas evidencian la autoría del diseño funcional, la arquitectura software, la lógica de negocio y la implementación técnica del prototipo.
-
-## Recomendaciones para publicación
-
-- Mantener el repositorio en modo privado si los PDFs de ejemplo o los datos semilla no son redistribuibles públicamente.
-- No versionar credenciales reales ni tokens OAuth; el repositorio ya está preparado para trabajar con `.env` y ficheros locales ignorados por Git.
-- Si se quisiera una publicación abierta definitiva, conviene revisar previamente el contenido de `data/references/` y `seed_data/pdfs/`.
-
 ## Licencia
 
 Este proyecto se distribuye bajo licencia **MIT**. Consulta el fichero `LICENSE` para más detalle.
