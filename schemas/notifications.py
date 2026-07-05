@@ -1,4 +1,4 @@
-"""Módulo `schemas/notifications.py` de la plataforma Sales Qualification Agent."""
+"""Schema del mensaje de correo preparado para la capa de notificaciones."""
 
 # schemas/notifications.py
 from __future__ import annotations
@@ -6,7 +6,7 @@ from typing import List, Literal
 from pydantic import BaseModel, EmailStr, Field
 
 class EmailNotification(BaseModel):
-    """Define `EmailNotification` dentro de este modulo."""
+    """Email listo para ser enviado por la capa de notificaciones."""
     to: List[EmailStr] = Field(min_length=1)
     cc: List[EmailStr] = Field(default_factory=list)
     subject: str = Field(min_length=5, max_length=180)

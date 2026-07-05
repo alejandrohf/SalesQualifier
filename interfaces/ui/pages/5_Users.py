@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/pages/5_Users.py` de la plataforma Sales Qualification Agent."""
+"""Administración de usuarios, capacidades y responsables técnicos desde la UI."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def _fmt_dt(value: Any) -> str:
 
 
 def main() -> None:
-    """Ejecuta `main` dentro de este modulo."""
+    """Renderiza el panel de gestión de usuarios y sus acciones administrativas."""
     set_page_config()
     require_authentication()
     sidebar_header()

@@ -1,4 +1,4 @@
-"""Módulo `tests/test_supervisor_helpers.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas de utilidades internas del supervisor del workflow multiagente."""
 
 from __future__ import annotations
 

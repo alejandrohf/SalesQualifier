@@ -1,4 +1,4 @@
-"""Módulo `tests/test_contract_schemas.py` de la plataforma Sales Qualification Agent."""
+"""Validaciones automáticas sobre esquemas Pydantic y contratos internos de respuesta."""
 
 from __future__ import annotations
 

@@ -1,4 +1,8 @@
-"""Módulo `domain/auth.py` de la plataforma Sales Qualification Agent."""
+"""Utilidades de autenticación y gestión de tokens del dominio.
+
+Incluye hashing de contraseñas, creación y validación de JWT y helpers para
+reseteo seguro de contraseñas.
+"""
 
 from __future__ import annotations
 
@@ -25,12 +29,12 @@ def _b64url_decode(data: str) -> bytes:
 
 
 def hash_password(password: str) -> str:
-    """Ejecuta `hash_password` dentro de este modulo."""
+    """Genera un hash bcrypt seguro a partir de una contraseña en texto plano."""
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(password: str, password_hash: str) -> bool:
-    """Ejecuta `verify_password` dentro de este modulo."""
+    """Comprueba si una contraseña en texto plano coincide con su hash almacenado."""
     try:
         return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
     except Exception:
@@ -38,7 +42,7 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def create_access_token(*, subject: str, email: str, role: str, expires_minutes: int | None = None) -> tuple[str, int]:
-    """Ejecuta `create_access_token` dentro de este modulo."""
+    """Construye un JWT firmado con la identidad y expiración del usuario."""
     exp_minutes = expires_minutes or int(config.JWT_EXPIRE_MINUTES)
     now = datetime.now(timezone.utc)
     exp = now + timedelta(minutes=exp_minutes)
@@ -59,7 +63,7 @@ def create_access_token(*, subject: str, email: str, role: str, expires_minutes:
 
 
 def decode_access_token(token: str) -> Dict[str, Any]:
-    """Ejecuta `decode_access_token` dentro de este modulo."""
+    """Valida la firma y expiración de un JWT y devuelve su payload."""
     try:
         header_b64, payload_b64, signature_b64 = token.split(".")
     except ValueError as e:
@@ -80,17 +84,17 @@ def decode_access_token(token: str) -> Dict[str, Any]:
 
 
 def ensure_roles(user_role: str, allowed_roles: Iterable[str]) -> None:
-    """Ejecuta `ensure_roles` dentro de este modulo."""
+    """Verifica que un rol pertenece al conjunto permitido para una operación."""
     allowed = {r.strip().lower() for r in allowed_roles}
     if user_role.strip().lower() not in allowed:
         raise PermissionError("Insufficient role permissions")
 
 
 def generate_secure_token() -> str:
-    """Ejecuta `generate_secure_token` dentro de este modulo."""
+    """Genera un token aleatorio seguro para enlaces de alta o reseteo."""
     return secrets.token_urlsafe(48)
 
 
 def hash_reset_token(token: str) -> str:
-    """Ejecuta `hash_reset_token` dentro de este modulo."""
+    """Aplica SHA-256 al token de reseteo para persistirlo sin guardar el valor en claro."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()

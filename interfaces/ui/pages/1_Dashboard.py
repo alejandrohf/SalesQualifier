@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/pages/1_Dashboard.py` de la plataforma Sales Qualification Agent."""
+"""Dashboard operativo con KPIs, embudos y distribución de oportunidades cualificadas."""
 
 from __future__ import annotations
 
@@ -175,7 +175,7 @@ def _pct(part: int, total: int) -> float:
 
 
 def main():
-    """Ejecuta `main` dentro de este modulo."""
+    """Renderiza el dashboard principal y sus filtros temporales, técnicos y comerciales."""
     set_page_config()
     require_authentication()
     sidebar_header()

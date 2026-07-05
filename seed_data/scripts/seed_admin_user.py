@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Módulo `seed_data/scripts/seed_admin_user.py` de la plataforma Sales Qualification Agent."""
+"""Script para crear o actualizar un usuario administrador inicial de la plataforma."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from infrastructure.db.users import (
 
 
 def main() -> None:
-    """Ejecuta `main` dentro de este modulo."""
+    """Parsea argumentos CLI y crea el usuario administrador de arranque."""
     parser = argparse.ArgumentParser(description="Crea un usuario administrador inicial.")
     parser.add_argument("--email", required=True)
     parser.add_argument("--first-name", required=True)

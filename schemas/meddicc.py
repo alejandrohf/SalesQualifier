@@ -1,4 +1,4 @@
-"""Módulo `schemas/meddicc.py` de la plataforma Sales Qualification Agent."""
+"""Schemas del análisis MEDDICC y del contexto enriquecido del cliente."""
 
 # schemas/meddicc.py
 from __future__ import annotations
@@ -16,7 +16,7 @@ from .common import (
 )
 
 class MeddiccDimension(AppBaseModel):
-    """Define `MeddiccDimension` dentro de este modulo."""
+    """Resultado estructurado de una dimensión individual del análisis MEDDICC."""
     status: Status
     score: float = Field(..., ge=0.0)
     evidence: List[str] = Field(default_factory=list)
@@ -25,7 +25,7 @@ class MeddiccDimension(AppBaseModel):
 
 
 class ClientContext(AppBaseModel):
-    """Define `ClientContext` dentro de este modulo."""
+    """Contexto del cliente combinado a partir del formulario y del enriquecimiento externo."""
     source: ClientContextSource
     client_name: str
     is_new_client: bool
@@ -39,7 +39,7 @@ class ClientContext(AppBaseModel):
 
 
 class Meddicc(AppBaseModel):
-    """Define `Meddicc` dentro de este modulo."""
+    """Agrupa las siete dimensiones del framework MEDDICC para una oportunidad."""
     metrics: MeddiccDimension
     economic_buyer: MeddiccDimension
     decision_criteria: MeddiccDimension
@@ -50,11 +50,7 @@ class Meddicc(AppBaseModel):
 
 
 class MeddiccLLMSummary(AppBaseModel):
-    """
-    OJO: Este summary es el que devuelve el LLM.
-    Luego tú lo recalculas determinísticamente en domain/scoring.py
-    y lo guardas aparte (ScoringSummary).
-    """
+    """Resumen generado por el LLM antes del recálculo determinista del scoring."""
     total_score: confloat(ge=0.0, le=10.0)
     qualification_level: Optional[QualificationLevel] = None
     recommended_action: Optional[RecommendedAction] = None
@@ -64,7 +60,7 @@ class MeddiccLLMSummary(AppBaseModel):
 
 
 class MeddiccReport(AppBaseModel):
-    """Define `MeddiccReport` dentro de este modulo."""
+    """Informe completo del análisis MEDDICC, incluyendo contexto y resumen final."""
     client_context: ClientContext
     meddicc: Meddicc
     summary: MeddiccLLMSummary

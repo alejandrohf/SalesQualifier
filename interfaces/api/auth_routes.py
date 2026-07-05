@@ -1,4 +1,4 @@
-"""Módulo `interfaces/api/auth_routes.py` de la plataforma Sales Qualification Agent."""
+"""Endpoints de autenticación, administración de usuarios y reseteo de contraseña."""
 
 from __future__ import annotations
 
@@ -68,7 +68,7 @@ def _send_reset_email(email: str, full_name: str, reset_token: str) -> SendReset
 
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest):
-    """Ejecuta `login` dentro de este modulo."""
+    """Autentica a un usuario, actualiza su último acceso y devuelve un JWT."""
     user = get_user_auth_by_email(payload.email)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
@@ -97,13 +97,13 @@ def login(payload: LoginRequest):
 
 @router.get("/me", response_model=UserOut)
 def me(current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Ejecuta `me` dentro de este modulo."""
+    """Devuelve la identidad del usuario autenticado actual."""
     return UserOut.model_validate(current_user)
 
 
 @router.get("/users", response_model=UserListResponse)
 def get_users(_: Dict[str, Any] = Depends(require_admin())):
-    """Ejecuta `get_users` dentro de este modulo."""
+    """Lista todos los usuarios disponibles para administración."""
     users = list_users()
     return UserListResponse(users=[UserOut.model_validate(u) for u in users], total=len(users))
 
@@ -113,7 +113,7 @@ def create_user_endpoint(
     payload: CreateUserRequest,
     current_user: Dict[str, Any] = Depends(require_admin()),
 ):
-    """Ejecuta `create_user_endpoint` dentro de este modulo."""
+    """Da de alta un usuario y, si procede, dispara el flujo de creación de contraseña."""
     if get_user_by_email(str(payload.email)):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User email already exists")
 
@@ -162,7 +162,7 @@ def patch_user_endpoint(
     payload: UpdateUserRequest,
     current_user: Dict[str, Any] = Depends(require_admin()),
 ):
-    """Ejecuta `patch_user_endpoint` dentro de este modulo."""
+    """Actualiza datos o capacidades de un usuario existente con validaciones de negocio."""
     patch = payload.model_dump(exclude_none=True)
     user_before = get_user_by_id(user_id)
     if not user_before:
@@ -205,7 +205,7 @@ def activate_user_endpoint(
     user_id: UUID,
     current_user: Dict[str, Any] = Depends(require_admin()),
 ):
-    """Ejecuta `activate_user_endpoint` dentro de este modulo."""
+    """Reactiva una cuenta de usuario previamente deshabilitada."""
     user = set_user_active(user_id, is_active=True, updated_by=current_user["id"])
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -217,7 +217,7 @@ def deactivate_user_endpoint(
     user_id: UUID,
     current_user: Dict[str, Any] = Depends(require_admin()),
 ):
-    """Ejecuta `deactivate_user_endpoint` dentro de este modulo."""
+    """Desactiva una cuenta de usuario preservando su histórico."""
     if str(user_id) == str(current_user["id"]):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot deactivate current admin")
     user = set_user_active(user_id, is_active=False, updated_by=current_user["id"])
@@ -231,7 +231,7 @@ def send_reset_email_endpoint(
     user_id: UUID,
     current_user: Dict[str, Any] = Depends(require_admin()),
 ):
-    """Ejecuta `send_reset_email_endpoint` dentro de este modulo."""
+    """Genera y envía un nuevo enlace de reseteo o activación de contraseña."""
     user = get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -252,7 +252,7 @@ def send_reset_email_endpoint(
 
 @router.post("/reset-password")
 def reset_password(payload: PasswordResetRequest):
-    """Ejecuta `reset_password` dentro de este modulo."""
+    """Consume un token válido y establece una nueva contraseña para el usuario."""
     token_data = consume_password_reset_token(hash_reset_token(payload.token))
     if not token_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired reset token")

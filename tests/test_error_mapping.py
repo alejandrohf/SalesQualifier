@@ -1,4 +1,4 @@
-"""Módulo `tests/test_error_mapping.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas unitarias del mapeo de errores y degradación controlada de la API."""
 
 from __future__ import annotations
 

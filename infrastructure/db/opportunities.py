@@ -1,4 +1,8 @@
-"""Módulo `infrastructure/db/opportunities.py` de la plataforma Sales Qualification Agent."""
+"""Acceso a datos para oportunidades cualificadas y revisión técnica.
+
+Este módulo encapsula las operaciones de persistencia y consulta sobre el
+histórico de oportunidades procesadas por la plataforma.
+"""
 
 from __future__ import annotations
 
@@ -31,7 +35,7 @@ def save_opportunity_qualification(
     assigned_engineering_user_id: str | None = None,
     technical_status: str = "pending",
 ) -> None:
-    """Ejecuta `save_opportunity_qualification` dentro de este modulo."""
+    """Persiste una oportunidad procesada junto con request, response y traza del workflow."""
     try:
         with SessionLocal() as db:
             row = OpportunityQualificationORM(
@@ -56,7 +60,7 @@ def save_opportunity_qualification(
 
 
 def list_opportunity_qualifications(limit: int = 500, offset: int = 0) -> List[Dict[str, Any]]:
-    """Ejecuta `list_opportunity_qualifications` dentro de este modulo."""
+    """Recupera el histórico de oportunidades cualificadas en orden descendente de fecha."""
     try:
         with SessionLocal() as db:
             stmt = (
@@ -93,7 +97,7 @@ def list_opportunity_qualifications(limit: int = 500, offset: int = 0) -> List[D
 
 
 def count_opportunity_qualifications() -> int:
-    """Ejecuta `count_opportunity_qualifications` dentro de este modulo."""
+    """Cuenta cuántas oportunidades han sido registradas en persistencia."""
     try:
         with SessionLocal() as db:
             stmt = select(func.count(OpportunityQualificationORM.id))
@@ -105,7 +109,7 @@ def count_opportunity_qualifications() -> int:
 
 
 def get_opportunity_qualification_by_id(opportunity_id: str) -> Dict[str, Any] | None:
-    """Ejecuta `get_opportunity_qualification_by_id` dentro de este modulo."""
+    """Obtiene una oportunidad concreta a partir de su identificador funcional."""
     try:
         with SessionLocal() as db:
             stmt = select(OpportunityQualificationORM).where(
@@ -141,7 +145,7 @@ def set_technical_decision(
     technical_decision_by_user_id: str | None,
     technical_comment: str | None,
 ) -> bool:
-    """Ejecuta `set_technical_decision` dentro de este modulo."""
+    """Registra la decisión técnica GO/NO GO y sus metadatos de auditoría."""
     try:
         with SessionLocal() as db:
             stmt = select(OpportunityQualificationORM).where(

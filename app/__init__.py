@@ -1,4 +1,4 @@
-"""Módulo `app/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Paquete de configuración y arranque compartido de la aplicación."""
 
 # app/__init__.py
 

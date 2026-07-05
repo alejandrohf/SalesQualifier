@@ -1,4 +1,4 @@
-"""Módulo `tests/conftest.py` de la plataforma Sales Qualification Agent."""
+"""Fixtures y utilidades compartidas por la suite de pruebas automatizadas."""
 
 from __future__ import annotations
 

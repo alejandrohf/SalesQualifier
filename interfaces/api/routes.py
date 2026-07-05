@@ -1,4 +1,4 @@
-"""Módulo `interfaces/api/routes.py` de la plataforma Sales Qualification Agent."""
+"""Rutas principales de cualificación, monitorización y revisión técnica."""
 
 # interfaces/api/routes.py
 from __future__ import annotations
@@ -57,7 +57,7 @@ class QualifyEnvelopeResponse(Dict[str, Any]):
 
 
 class TechnicalDecisionRequest(BaseModel):
-    """Define `TechnicalDecisionRequest` dentro de este modulo."""
+    """Payload usado por ingeniería para registrar una decisión GO o NO GO."""
     decision: str
     comment: Optional[str] = None
 
@@ -266,7 +266,7 @@ def set_opportunity_technical_decision(
     body: TechnicalDecisionRequest,
     current_user=Depends(require_engineering()),
 ):
-    """Ejecuta `set_opportunity_technical_decision` dentro de este modulo."""
+    """Registra la decisión técnica sobre una oportunidad si el usuario está autorizado."""
     decision = (body.decision or "").strip().lower()
     if decision not in ("go", "no_go"):
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="decision must be go or no_go")

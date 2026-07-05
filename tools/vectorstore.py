@@ -1,4 +1,8 @@
-"""Módulo `tools/vectorstore.py` de la plataforma Sales Qualification Agent."""
+"""Gestión del repositorio vectorial de referencias sobre PostgreSQL y pgvector.
+
+Incluye alta de referencias, reindexación, persistencia de embeddings y
+búsqueda semántica usada por el workflow y por la API.
+"""
 
 # tools/vectorstore.py
 from __future__ import annotations
@@ -40,7 +44,7 @@ _embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
 
 @dataclass(frozen=True)
 class ReferenceSearchFilters:
-    """Define `ReferenceSearchFilters` dentro de este modulo."""
+    """Filtros opcionales aplicables a la búsqueda de referencias semánticas."""
     industry: Optional[str] = None
     area: Optional[str] = None
     cloud: Optional[str] = None
@@ -49,7 +53,7 @@ class ReferenceSearchFilters:
 
 @dataclass(frozen=True)
 class ReferenceSearchHit:
-    """Define `ReferenceSearchHit` dentro de este modulo."""
+    """Resultado elemental de una búsqueda vectorial sobre el catálogo de referencias."""
     reference_id: UUID
     title: str
     customer: str
@@ -114,7 +118,7 @@ def create_reference(meta: CustomerReferenceCreate, pdf_bytes: bytes) -> UUID:
 
 
 def get_reference(reference_id: UUID) -> CustomerReferenceORM:
-    """Ejecuta `get_reference` dentro de este modulo."""
+    """Recupera una referencia concreta por su identificador."""
     with _get_db() as db:
         ref = db.get(CustomerReferenceORM, reference_id)
         if not ref:
@@ -123,7 +127,7 @@ def get_reference(reference_id: UUID) -> CustomerReferenceORM:
 
 
 def list_references(limit: int = 50, offset: int = 0) -> List[CustomerReferenceORM]:
-    """Ejecuta `list_references` dentro de este modulo."""
+    """Lista referencias ordenadas por fecha de actualización."""
     with _get_db() as db:
         stmt = (
             select(CustomerReferenceORM)
@@ -135,7 +139,7 @@ def list_references(limit: int = 50, offset: int = 0) -> List[CustomerReferenceO
 
 
 def update_reference_metadata(reference_id: UUID, patch: Dict[str, Any]) -> None:
-    """Ejecuta `update_reference_metadata` dentro de este modulo."""
+    """Actualiza los metadatos editables de una referencia existente."""
     allowed = {"title", "customer", "industry", "area", "cloud", "size"}
     patch = {k: v for k, v in patch.items() if k in allowed}
 
@@ -171,7 +175,7 @@ def replace_reference_pdf(reference_id: UUID, pdf_bytes: bytes) -> None:
 
 
 def delete_reference(reference_id: UUID) -> None:
-    """Ejecuta `delete_reference` dentro de este modulo."""
+    """Elimina una referencia del catálogo y limpia su documento local si existe."""
     with _get_db() as db:
         ref = db.get(CustomerReferenceORM, reference_id)
         if not ref:

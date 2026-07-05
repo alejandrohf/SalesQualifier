@@ -1,2 +1,2 @@
-"""Módulo `interfaces/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Paquete que agrupa las interfaces de entrada y salida de la solución."""
 

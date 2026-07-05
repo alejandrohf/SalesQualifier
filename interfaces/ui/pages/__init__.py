@@ -1,2 +1,2 @@
-"""Módulo `interfaces/ui/pages/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Páginas funcionales de la interfaz Streamlit."""
 

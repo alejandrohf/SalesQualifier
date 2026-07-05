@@ -1,4 +1,4 @@
-"""Módulo `tools/pdf_loader.py` de la plataforma Sales Qualification Agent."""
+"""Extracción de texto y fragmentación de documentos PDF para indexación semántica."""
 
 # tools/pdf_loader.py
 from __future__ import annotations
@@ -12,13 +12,13 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 @dataclass(frozen=True)
 class Chunk:
-    """Define `Chunk` dentro de este modulo."""
+    """Fragmento numerado de texto extraído de un documento para su posterior indexación."""
     index: int
     text: str
 
 
 def extract_text_from_pdf(pdf_path: str, max_pages: Optional[int] = None) -> str:
-    """Ejecuta `extract_text_from_pdf` dentro de este modulo."""
+    """Extrae el texto legible de un PDF, opcionalmente limitando el número de páginas."""
     reader = PdfReader(pdf_path)
     texts: list[str] = []
 
@@ -33,7 +33,7 @@ def extract_text_from_pdf(pdf_path: str, max_pages: Optional[int] = None) -> str
 
 
 def chunk_text(text: str, chunk_size: int = 900, chunk_overlap: int = 120) -> List[Chunk]:
-    """Ejecuta `chunk_text` dentro de este modulo."""
+    """Divide un texto en fragmentos solapados usando un splitter basado en caracteres."""
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,

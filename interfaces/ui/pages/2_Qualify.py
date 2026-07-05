@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/pages/2_Qualify.py` de la plataforma Sales Qualification Agent."""
+"""Formulario de alta y cualificación de nuevas oportunidades comerciales."""
 
 from __future__ import annotations
 
@@ -146,7 +146,7 @@ def build_opportunity_payload_from_form(needs_date: bool, proposal_due_date: dat
 
 
 def main():
-    """Ejecuta `main` dentro de este modulo."""
+    """Renderiza el formulario de cualificación y envía la oportunidad a la API."""
     set_page_config()
     require_authentication()
     sidebar_header()

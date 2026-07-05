@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/components/auth.py` de la plataforma Sales Qualification Agent."""
+"""Helpers de autenticación y sesión para las páginas de Streamlit."""
 
 from __future__ import annotations
 
@@ -10,24 +10,24 @@ from interfaces.ui.client import ApiClient, get_api_client
 
 
 def get_session_token() -> Optional[str]:
-    """Ejecuta `get_session_token` dentro de este modulo."""
+    """Recupera el token de autenticación almacenado en la sesión de Streamlit."""
     return st.session_state.get("auth_token")
 
 
 def get_session_user() -> Optional[Dict[str, Any]]:
-    """Ejecuta `get_session_user` dentro de este modulo."""
+    """Recupera el usuario autenticado almacenado en sesión."""
     return st.session_state.get("auth_user")
 
 
 def clear_auth_session() -> None:
-    """Ejecuta `clear_auth_session` dentro de este modulo."""
+    """Limpia por completo el estado de autenticación de la sesión actual."""
     st.session_state.pop("auth_token", None)
     st.session_state.pop("auth_user", None)
     st.session_state.pop("auth_expires_in", None)
 
 
 def get_authenticated_api_client() -> ApiClient:
-    """Ejecuta `get_authenticated_api_client` dentro de este modulo."""
+    """Devuelve un cliente API con el bearer token actual ya configurado."""
     client = get_api_client()
     token = get_session_token()
     if token:
@@ -36,7 +36,7 @@ def get_authenticated_api_client() -> ApiClient:
 
 
 def require_authentication() -> None:
-    """Ejecuta `require_authentication` dentro de este modulo."""
+    """Fuerza autenticación válida antes de permitir el acceso a una página protegida."""
     token = get_session_token()
     if not token:
         st.warning("Debes iniciar sesión para acceder a esta página.")

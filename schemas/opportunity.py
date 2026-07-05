@@ -1,4 +1,4 @@
-"""Módulo `schemas/opportunity.py` de la plataforma Sales Qualification Agent."""
+"""Schemas de entrada y persistencia lógica para oportunidades comerciales."""
 
 # schemas/opportunity.py
 from __future__ import annotations
@@ -20,17 +20,14 @@ from .common import (
 )
 
 class Requester(AppBaseModel):
-    """Define `Requester` dentro de este modulo."""
+    """Persona de contacto asociada a la oportunidad y su capacidad de influencia."""
     name: str
     role: DecisionRole = "unknown"
     seniority: Seniority = "employee"
 
 
 class OpportunityInput(AppBaseModel):
-    """
-    Input del comercial (formulario).
-    - Es lo mínimo que tu workflow necesita para disparar MEDDICC.
-    """
+    """Datos mínimos y contexto comercial necesarios para cualificar una oportunidad."""
     client_name: str
     is_new_client: bool = False
     client_website: Optional[HttpUrl] = None
@@ -47,10 +44,10 @@ class OpportunityInput(AppBaseModel):
     partner: Partner = "none"
     main_area: MainArea = "other"
 
-    relationship_trust: conint(ge=1, le=5) = 3  # 1-5
+    relationship_trust: conint(ge=1, le=5) = 3
     sales_confidence: str = Field(
         default="unknown",
-        description="Alta/Media/Baja/No sabe (normalizamos si quieres).",
+        description="Percepción inicial del comercial sobre la probabilidad o solidez de la oportunidad.",
     )
 
     needs_date: bool = False
@@ -62,9 +59,6 @@ class OpportunityInput(AppBaseModel):
 
 
 class OpportunityRecord(OpportunityInput):
-    """
-    Versión lista para persistir (si decides guardar en BD).
-    Puedes ampliarla con IDs, estado, etc.
-    """
+    """Versión persistible de la oportunidad con metadatos de trazabilidad e identificador."""
     metadata: Metadata = Field(default_factory=Metadata)
     opportunity_id: Optional[str] = None

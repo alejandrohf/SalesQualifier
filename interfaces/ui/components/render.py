@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/components/render.py` de la plataforma Sales Qualification Agent."""
+"""Funciones de renderizado reutilizable para resultados, errores y KPIs en Streamlit."""
 
 # interfaces/ui/components/render.py
 from __future__ import annotations
@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 import streamlit as st
 
 def show_api_error(e: Exception):
-    """Ejecuta `show_api_error` dentro de este modulo."""
+    """Presenta de forma amigable un error devuelto por la API."""
     st.error(str(e))
     if hasattr(e, "detail"):
         with st.expander("Detalle"):
@@ -68,7 +68,7 @@ def show_envelope_result(result: Dict[str, Any]):
                 st.write(commercial)
 
 def json_expander(title: str, data: Any, expanded: bool = False):
-    """Ejecuta `json_expander` dentro de este modulo."""
+    """Muestra un bloque JSON colapsable cuando existe contenido que inspeccionar."""
     if data is None:
         return
     with st.expander(title, expanded=expanded):

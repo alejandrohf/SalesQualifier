@@ -1,4 +1,4 @@
-"""Módulo `workflows/state.py` de la plataforma Sales Qualification Agent."""
+"""Definición del estado compartido usado por el grafo LangGraph del workflow."""
 
 # workflows/state.py
 from __future__ import annotations

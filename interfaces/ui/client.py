@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/client.py` de la plataforma Sales Qualification Agent."""
+"""Cliente HTTP de la interfaz Streamlit para consumir la API del backend."""
 
 # interfaces/ui/client.py
 from __future__ import annotations
@@ -12,13 +12,13 @@ import requests
 
 @dataclass(frozen=True)
 class ApiClientConfig:
-    """Define `ApiClientConfig` dentro de este modulo."""
+    """Configuración base del cliente HTTP usado por la interfaz web."""
     base_url: str
     timeout_s: int = 180
 
 
 class ApiError(RuntimeError):
-    """Define `ApiError` dentro de este modulo."""
+    """Excepción de alto nivel para errores devueltos por la API."""
     def __init__(self, message: str, status_code: Optional[int] = None, detail: Any = None):
         super().__init__(message)
         self.status_code = status_code
@@ -26,7 +26,7 @@ class ApiError(RuntimeError):
 
 
 class ApiClient:
-    """Define `ApiClient` dentro de este modulo."""
+    """Wrapper de alto nivel sobre `requests` con métodos alineados con la API del proyecto."""
     def __init__(self, cfg: ApiClientConfig):
         self.cfg = cfg
         self.session = requests.Session()
@@ -223,7 +223,7 @@ class ApiClient:
 
 def get_api_client() -> ApiClient:
     # Configurable por env var. Fallback para local dev.
-    """Ejecuta `get_api_client` dentro de este modulo."""
+    """Construye un cliente API usando la configuración disponible en variables de entorno."""
     base_url = os.getenv("API_BASE_URL", "http://localhost:8000")
     timeout_s = int(os.getenv("API_TIMEOUT_S", "180"))
     return ApiClient(ApiClientConfig(base_url=base_url, timeout_s=timeout_s))

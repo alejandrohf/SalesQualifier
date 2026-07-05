@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Módulo `seed_data/scripts/seed_references.py` de la plataforma Sales Qualification Agent."""
+"""Módulo de carga de referencias usando los PDFs de la carpeta de Seed para la plataforma Sales Qualification Agent."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ def _post_reference(api_base: str, ref: Dict[str, Any], pdf_path: Path, timeout_
 
 
 def main() -> None:
-    """Ejecuta `main` dentro de este modulo."""
+    """Carga el catálogo base de referencias PDF y su metadata en el sistema."""
     parser = argparse.ArgumentParser(description="Seed de referencias (PDF + metadata) hacia FastAPI.")
     parser.add_argument("--api-base", default=os.getenv("API_BASE_URL", "http://localhost:8000"))
     parser.add_argument("--data-dir", default="seed_data", help="Directorio con references_metadata.json y subcarpeta pdfs/")

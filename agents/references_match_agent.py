@@ -1,4 +1,4 @@
-"""Módulo `agents/references_match_agent.py` de la plataforma Sales Qualification Agent."""
+"""Agente que recupera referencias internas similares usando búsqueda vectorial."""
 
 # agents/references_match_agent.py
 from __future__ import annotations

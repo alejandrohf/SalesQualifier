@@ -1,4 +1,4 @@
-"""Módulo `tools/email_sender.py` de la plataforma Sales Qualification Agent."""
+"""Envío de correo saliente a través de Gmail OAuth para notificaciones del sistema."""
 
 from __future__ import annotations
 
@@ -34,5 +34,5 @@ def _send_via_gmail_api(*, to_email: str, subject: str, body: str) -> None:
 
 
 def send_plain_email(*, to_email: str, subject: str, body: str) -> None:
-    """Ejecuta `send_plain_email` dentro de este modulo."""
+    """Envía un correo de texto plano usando la integración configurada de Gmail."""
     _send_via_gmail_api(to_email=to_email, subject=subject, body=body)

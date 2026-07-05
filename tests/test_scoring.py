@@ -1,4 +1,4 @@
-"""Módulo `tests/test_scoring.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas unitarias del scoring determinista y de las decisiones derivadas."""
 
 from __future__ import annotations
 

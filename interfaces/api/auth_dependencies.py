@@ -1,4 +1,4 @@
-"""Módulo `interfaces/api/auth_dependencies.py` de la plataforma Sales Qualification Agent."""
+"""Dependencias reutilizables de autenticación y autorización para FastAPI."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
-    """Ejecuta `get_current_user` dentro de este modulo."""
+    """Resuelve el usuario autenticado a partir del bearer token recibido."""
     try:
         payload = decode_access_token(token)
     except Exception:
@@ -38,7 +38,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
 
 
 def require_admin():
-    """Ejecuta `require_admin` dentro de este modulo."""
+    """Construye una dependencia que exige capacidad administrativa."""
     def _dep(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
         if not bool(user.get("is_admin")):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin capability required")
@@ -48,7 +48,7 @@ def require_admin():
 
 
 def require_sales():
-    """Ejecuta `require_sales` dentro de este modulo."""
+    """Construye una dependencia que exige capacidad comercial."""
     def _dep(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
         if not bool(user.get("can_sales")):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Sales capability required")
@@ -58,7 +58,7 @@ def require_sales():
 
 
 def require_engineering():
-    """Ejecuta `require_engineering` dentro de este modulo."""
+    """Construye una dependencia que exige capacidad técnica."""
     def _dep(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
         if not bool(user.get("can_engineering")):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Engineering capability required")
@@ -68,7 +68,7 @@ def require_engineering():
 
 
 def require_sales_or_engineering():
-    """Ejecuta `require_sales_or_engineering` dentro de este modulo."""
+    """Construye una dependencia válida para perfiles comerciales o técnicos."""
     def _dep(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
         if not bool(user.get("can_sales") or user.get("can_engineering")):
             raise HTTPException(

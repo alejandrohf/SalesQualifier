@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Módulo `seed_data/scripts/seed_qualifications.py` de la plataforma Sales Qualification Agent."""
+"""Generación de oportunidades y cualificaciones de ejemplo para demos o pruebas manuales."""
 
 from __future__ import annotations
 
@@ -113,7 +113,7 @@ def _post_qualify(api_base: str, payload: Dict[str, Any], timeout_s: int) -> Dic
 
 
 def main() -> None:
-    """Ejecuta `main` dentro de este modulo."""
+    """Genera oportunidades sintéticas y las envía al backend para poblar el histórico."""
     parser = argparse.ArgumentParser(description="Genera cualificaciones de prueba y llama a /api/qualify.")
     parser.add_argument("--api-base", default=os.getenv("API_BASE_URL", "http://localhost:8000"))
     parser.add_argument("--count", type=int, default=20, help="Número de oportunidades a generar")

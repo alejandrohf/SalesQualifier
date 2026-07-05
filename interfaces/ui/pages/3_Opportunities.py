@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/pages/3_Opportunities.py` de la plataforma Sales Qualification Agent."""
+"""Pantalla de consulta detallada del histórico de oportunidades procesadas."""
 
 from __future__ import annotations
 
@@ -272,7 +272,7 @@ def _render_full_detail(selected: dict[str, Any]) -> None:
 
 
 def main():
-    """Ejecuta `main` dentro de este modulo."""
+    """Muestra el listado de oportunidades y el detalle enriquecido de cada registro."""
     set_page_config()
     require_authentication()
     sidebar_header()

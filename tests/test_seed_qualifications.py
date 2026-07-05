@@ -1,4 +1,4 @@
-"""Módulo `tests/test_seed_qualifications.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas de generación de datos semilla para oportunidades de ejemplo."""
 
 from __future__ import annotations
 

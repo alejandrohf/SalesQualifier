@@ -1,4 +1,4 @@
-"""Módulo `tests/test_api_contracts.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas de contratos JSON expuestos por los endpoints principales de la API."""
 
 from __future__ import annotations
 

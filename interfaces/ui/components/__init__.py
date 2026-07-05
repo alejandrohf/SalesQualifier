@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/components/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Componentes visuales y helpers reutilizables de la interfaz Streamlit."""
 
 from .layout import page_header as page_header
 from .layout import set_page_config as set_page_config

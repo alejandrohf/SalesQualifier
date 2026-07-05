@@ -1,4 +1,4 @@
-"""Módulo `agents/client_website_analyzer.py` de la plataforma Sales Qualification Agent."""
+"""Agente encargado de resumir contexto corporativo a partir de la web del cliente."""
 
 from __future__ import annotations
 

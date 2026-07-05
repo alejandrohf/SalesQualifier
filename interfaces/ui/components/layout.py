@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/components/layout.py` de la plataforma Sales Qualification Agent."""
+"""Sistema visual compartido de la interfaz Streamlit: estilos, cabeceras y componentes de layout."""
 
 # interfaces/ui/components/layout.py
 from __future__ import annotations
@@ -313,7 +313,7 @@ def inject_global_styles() -> None:
 
 
 def set_page_config() -> None:
-    """Ejecuta `set_page_config` dentro de este modulo."""
+    """Aplica la configuración base de página y los estilos globales de la UI."""
     st.set_page_config(
         page_title="Sales Qualification Platform",
         page_icon="🧠",
@@ -324,7 +324,7 @@ def set_page_config() -> None:
 
 
 def sidebar_header() -> None:
-    """Ejecuta `sidebar_header` dentro de este modulo."""
+    """Renderiza la cabecera lateral con información de sesión y navegación contextual."""
     st.sidebar.title("Sales Qualifier")
 
     base_url = os.getenv("API_BASE_URL", "http://localhost:8000")

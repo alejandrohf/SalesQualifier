@@ -1,4 +1,4 @@
-"""Módulo `schemas/reference.py` de la plataforma Sales Qualification Agent."""
+"""Schemas y enums del catálogo de referencias corporativas y su metadata."""
 
 # schemas/reference.py
 from __future__ import annotations
@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 
 class Industry(str, Enum):
-    """Define `Industry` dentro de este modulo."""
+    """Sectores admitidos para clasificar referencias corporativas."""
     legal_business_services = "Legal & Business Services"
     financial_services_insurance = "Financial Services & Insurance"
     real_estate = "Real Estate"
@@ -33,7 +33,7 @@ class Industry(str, Enum):
 
 
 class Area(str, Enum):
-    """Define `Area` dentro de este modulo."""
+    """Áreas de especialización usadas para etiquetar las referencias."""
     artificial_intelligence = "Artificial Intelligence"
     security = "Security"
     development = "Development"
@@ -46,7 +46,7 @@ class Area(str, Enum):
 
 
 class Cloud(str, Enum):
-    """Define `Cloud` dentro de este modulo."""
+    """Plataforma cloud principal asociada a una referencia."""
     azure = "Azure"
     google_cloud = "Google Cloud"
     aws = "AWS"
@@ -54,7 +54,7 @@ class Cloud(str, Enum):
 
 
 class Size(str, Enum):
-    """Define `Size` dentro de este modulo."""
+    """Tamaño relativo de la referencia dentro del catálogo."""
     xs = "XS"
     s = "S"
     m = "M"
@@ -63,7 +63,7 @@ class Size(str, Enum):
 
 
 class CustomerReferenceBase(BaseModel):
-    """Define `CustomerReferenceBase` dentro de este modulo."""
+    """Metadatos comunes de una referencia corporativa reusable."""
     title: str = Field(..., min_length=3, max_length=200)
     customer: str = Field(..., min_length=2, max_length=200)
     industry: Industry
@@ -73,12 +73,12 @@ class CustomerReferenceBase(BaseModel):
 
 
 class CustomerReferenceCreate(CustomerReferenceBase):
-    """Metadata para crear una referencia (el PDF se sube por UploadFile)."""
+    """Datos necesarios para crear una referencia; el PDF se adjunta por separado."""
     pass
 
 
 class CustomerReferenceUpdate(BaseModel):
-    """Permite editar metadata sin tocar documento."""
+    """Actualización parcial de la metadata de una referencia sin sustituir el documento."""
     title: Optional[str] = Field(None, min_length=3, max_length=200)
     customer: Optional[str] = Field(None, min_length=2, max_length=200)
     industry: Optional[Industry] = None
@@ -91,7 +91,7 @@ class CustomerReferenceUpdate(BaseModel):
 
 
 class CustomerReferenceOut(CustomerReferenceBase):
-    """Define `CustomerReferenceOut` dentro de este modulo."""
+    """Representación de salida de una referencia con datos de persistencia e indexación."""
     id: UUID
     document_path: str
     document_version: int = 1

@@ -1,4 +1,8 @@
-"""Módulo `infrastructure/db/users.py` de la plataforma Sales Qualification Agent."""
+"""Acceso a datos para usuarios, capacidades y tokens de reseteo.
+
+Centraliza las operaciones CRUD y las comprobaciones auxiliares necesarias para
+autenticación, administración y auditoría de usuarios.
+"""
 
 from __future__ import annotations
 
@@ -50,7 +54,7 @@ def _to_user_dict(u: UserORM) -> Dict[str, Any]:
 
 
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
-    """Ejecuta `get_user_by_email` dentro de este modulo."""
+    """Busca un usuario por email y devuelve su representación pública interna."""
     with SessionLocal() as db:
         stmt = select(UserORM).where(UserORM.email == email.strip().lower())
         row = db.scalar(stmt)
@@ -73,7 +77,7 @@ def get_user_auth_by_email(email: str) -> Optional[Dict[str, Any]]:
 
 
 def get_user_by_id(user_id: str | UUID) -> Optional[Dict[str, Any]]:
-    """Ejecuta `get_user_by_id` dentro de este modulo."""
+    """Obtiene un usuario por identificador UUID."""
     with SessionLocal() as db:
         stmt = select(UserORM).where(UserORM.id == user_id)
         row = db.scalar(stmt)
@@ -81,7 +85,7 @@ def get_user_by_id(user_id: str | UUID) -> Optional[Dict[str, Any]]:
 
 
 def list_users() -> List[Dict[str, Any]]:
-    """Ejecuta `list_users` dentro de este modulo."""
+    """Lista todos los usuarios ordenados por email."""
     with SessionLocal() as db:
         stmt = select(UserORM).order_by(asc(UserORM.email))
         rows = list(db.scalars(stmt).all())
@@ -101,7 +105,7 @@ def create_user(
     engineering_manager_id: str | UUID | None,
     created_by: str | UUID | None,
 ) -> Dict[str, Any]:
-    """Ejecuta `create_user` dentro de este modulo."""
+    """Crea un nuevo usuario con sus capacidades y metadatos de trazabilidad."""
     role_to_store = role or _legacy_role_from_caps(
         is_admin=bool(is_admin),
         can_sales=bool(can_sales),
@@ -131,7 +135,7 @@ def create_user(
 
 
 def update_user(user_id: str | UUID, *, patch: Dict[str, Any], updated_by: str | UUID | None) -> Optional[Dict[str, Any]]:
-    """Ejecuta `update_user` dentro de este modulo."""
+    """Aplica una actualización parcial sobre un usuario existente."""
     with SessionLocal() as db:
         stmt = select(UserORM).where(UserORM.id == user_id)
         row = db.scalar(stmt)
@@ -148,14 +152,14 @@ def update_user(user_id: str | UUID, *, patch: Dict[str, Any], updated_by: str |
 
 
 def set_user_active(user_id: str | UUID, *, is_active: bool, updated_by: str | UUID | None) -> Optional[Dict[str, Any]]:
-    """Ejecuta `set_user_active` dentro de este modulo."""
+    """Activa o desactiva lógicamente una cuenta de usuario."""
     now = datetime.now(timezone.utc)
     patch = {"is_active": bool(is_active), "disabled_at": None if is_active else now}
     return update_user(user_id, patch=patch, updated_by=updated_by)
 
 
 def set_last_login(user_id: str | UUID) -> None:
-    """Ejecuta `set_last_login` dentro de este modulo."""
+    """Actualiza la fecha del último acceso satisfactorio del usuario."""
     with SessionLocal() as db:
         stmt = select(UserORM).where(UserORM.id == user_id)
         row = db.scalar(stmt)
@@ -166,7 +170,7 @@ def set_last_login(user_id: str | UUID) -> None:
 
 
 def has_opportunities_created_by(user_id: str | UUID) -> bool:
-    """Ejecuta `has_opportunities_created_by` dentro de este modulo."""
+    """Indica si un usuario ha creado oportunidades en el sistema."""
     from infrastructure.db.models import OpportunityQualificationORM
 
     with SessionLocal() as db:
@@ -177,7 +181,7 @@ def has_opportunities_created_by(user_id: str | UUID) -> bool:
 
 
 def has_technical_decisions_by(user_id: str | UUID) -> bool:
-    """Ejecuta `has_technical_decisions_by` dentro de este modulo."""
+    """Comprueba si un usuario ha emitido decisiones técnicas sobre oportunidades."""
     from infrastructure.db.models import OpportunityQualificationORM
 
     with SessionLocal() as db:
@@ -188,7 +192,7 @@ def has_technical_decisions_by(user_id: str | UUID) -> bool:
 
 
 def set_user_password(user_id: str | UUID, *, password_hash: str, updated_by: str | UUID | None) -> bool:
-    """Ejecuta `set_user_password` dentro de este modulo."""
+    """Guarda una nueva contraseña hash y limpia el flag de cambio obligatorio."""
     with SessionLocal() as db:
         stmt = select(UserORM).where(UserORM.id == user_id)
         row = db.scalar(stmt)
@@ -208,7 +212,7 @@ def create_password_reset_token(
     expires_at: datetime,
     created_by: str | UUID | None,
 ) -> None:
-    """Ejecuta `create_password_reset_token` dentro de este modulo."""
+    """Persiste un token temporal de reseteo de contraseña para un usuario."""
     with SessionLocal() as db:
         row = UserPasswordResetTokenORM(
             user_id=user_id,
@@ -221,7 +225,7 @@ def create_password_reset_token(
 
 
 def consume_password_reset_token(token_hash: str) -> Optional[Dict[str, Any]]:
-    """Ejecuta `consume_password_reset_token` dentro de este modulo."""
+    """Marca un token como usado y devuelve el usuario asociado si sigue vigente."""
     now = datetime.now(timezone.utc)
     with SessionLocal() as db:
         stmt = (

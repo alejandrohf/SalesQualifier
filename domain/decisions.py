@@ -25,7 +25,7 @@ THRESHOLDS = {
 
 
 def determine_qualification_level(total_score: float) -> QualificationLevel:
-    """Ejecuta `determine_qualification_level` dentro de este modulo."""
+    """Clasifica una oportunidad en high, medium o low según su score total."""
     if total_score >= THRESHOLDS["high"]:
         return "high"
     if total_score >= THRESHOLDS["medium"]:
@@ -37,7 +37,7 @@ def determine_recommended_action(
     qualification_level: QualificationLevel,
     has_critical_risk: bool = False,
 ) -> RecommendedAction:
-    """Ejecuta `determine_recommended_action` dentro de este modulo."""
+    """Propone la acción comercial a partir del nivel de cualificación y del riesgo crítico."""
     if qualification_level == "high" and not has_critical_risk:
         return "invest_pre_sales"
     if qualification_level == "medium":

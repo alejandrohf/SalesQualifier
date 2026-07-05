@@ -1,4 +1,4 @@
-"""Módulo `tools/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Registro de herramientas reutilizables disponibles para los agentes del sistema."""
 
 # tools/__init__.py
 from __future__ import annotations

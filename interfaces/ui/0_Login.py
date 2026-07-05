@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/0_Login.py` de la plataforma Sales Qualification Agent."""
+"""Pantalla de acceso a la plataforma y gestión inicial de sesión."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def _save_auth(result: dict) -> None:
 
 
 def main() -> None:
-    """Ejecuta `main` dentro de este modulo."""
+    """Renderiza la página de login y procesa autenticación o reseteo de contraseña."""
     set_page_config()
     sidebar_header()
     page_header("Login", "Accede a la plataforma con tu usuario corporativo.")

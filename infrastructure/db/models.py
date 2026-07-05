@@ -1,4 +1,8 @@
-"""Módulo `infrastructure/db/models.py` de la plataforma Sales Qualification Agent."""
+"""Modelos ORM persistentes de la plataforma.
+
+Define las tablas principales de referencias, embeddings, oportunidades,
+usuarios y tokens de reseteo de contraseña.
+"""
 
 # infrastructure/db/models.py
 from __future__ import annotations
@@ -18,7 +22,7 @@ from infrastructure.db.base import Base
 
 
 class CustomerReferenceORM(Base):
-    """Define `CustomerReferenceORM` dentro de este modulo."""
+    """Entidad ORM que representa una referencia corporativa reusable y su metadata."""
     __tablename__ = "customer_references"
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -54,7 +58,7 @@ class CustomerReferenceORM(Base):
 
 
 class ReferenceEmbeddingORM(Base):
-    """Define `ReferenceEmbeddingORM` dentro de este modulo."""
+    """Fragmento indexado de una referencia con su embedding vectorial asociado."""
     __tablename__ = "reference_embeddings"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
@@ -84,7 +88,7 @@ class ReferenceEmbeddingORM(Base):
 
 
 class OpportunityQualificationORM(Base):
-    """Define `OpportunityQualificationORM` dentro de este modulo."""
+    """Persistencia de una oportunidad cualificada y de su ciclo de revisión técnica."""
     __tablename__ = "opportunity_qualifications"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
@@ -119,7 +123,7 @@ class OpportunityQualificationORM(Base):
 
 
 class UserORM(Base):
-    """Define `UserORM` dentro de este modulo."""
+    """Modelo ORM de usuario con capacidades, trazabilidad y estado de acceso."""
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -151,7 +155,7 @@ class UserORM(Base):
 
 
 class UserPasswordResetTokenORM(Base):
-    """Define `UserPasswordResetTokenORM` dentro de este modulo."""
+    """Token de un solo uso para alta inicial o reseteo de contraseña."""
     __tablename__ = "user_password_reset_tokens"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)

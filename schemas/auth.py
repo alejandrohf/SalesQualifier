@@ -1,4 +1,4 @@
-"""Módulo `schemas/auth.py` de la plataforma Sales Qualification Agent."""
+"""Schemas de autenticación, gestión de usuarios y reseteo de contraseña."""
 
 from __future__ import annotations
 
@@ -12,13 +12,13 @@ from schemas.common import AppBaseModel
 
 
 class LoginRequest(AppBaseModel):
-    """Define `LoginRequest` dentro de este modulo."""
+    """Credenciales necesarias para iniciar sesión en la plataforma."""
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=256)
 
 
 class UserOut(AppBaseModel):
-    """Define `UserOut` dentro de este modulo."""
+    """Representación pública de un usuario devuelta por la API."""
     id: UUID
     email: EmailStr
     first_name: str
@@ -38,7 +38,7 @@ class UserOut(AppBaseModel):
 
 
 class TokenResponse(AppBaseModel):
-    """Define `TokenResponse` dentro de este modulo."""
+    """Respuesta de autenticación con token JWT y datos del usuario autenticado."""
     access_token: str
     token_type: Literal["bearer"] = "bearer"
     expires_in: int
@@ -46,7 +46,7 @@ class TokenResponse(AppBaseModel):
 
 
 class CreateUserRequest(AppBaseModel):
-    """Define `CreateUserRequest` dentro de este modulo."""
+    """Datos necesarios para dar de alta un nuevo usuario desde administración."""
     email: EmailStr
     first_name: str = Field(..., min_length=1, max_length=120)
     last_name: str = Field(..., min_length=1, max_length=120)
@@ -58,7 +58,7 @@ class CreateUserRequest(AppBaseModel):
 
 
 class UpdateUserRequest(AppBaseModel):
-    """Define `UpdateUserRequest` dentro de este modulo."""
+    """Actualización parcial de nombre, capacidades o estado de un usuario existente."""
     first_name: Optional[str] = Field(default=None, min_length=1, max_length=120)
     last_name: Optional[str] = Field(default=None, min_length=1, max_length=120)
     is_admin: Optional[bool] = None
@@ -69,18 +69,18 @@ class UpdateUserRequest(AppBaseModel):
 
 
 class UserListResponse(AppBaseModel):
-    """Define `UserListResponse` dentro de este modulo."""
+    """Listado paginable de usuarios devuelto por la API de administración."""
     users: List[UserOut] = Field(default_factory=list)
     total: int
 
 
 class PasswordResetRequest(AppBaseModel):
-    """Define `PasswordResetRequest` dentro de este modulo."""
+    """Petición para establecer una nueva contraseña a partir de un token de reseteo."""
     token: str = Field(..., min_length=16, max_length=512)
     new_password: str = Field(..., min_length=8, max_length=256)
 
 
 class SendResetResponse(AppBaseModel):
-    """Define `SendResetResponse` dentro de este modulo."""
+    """Resultado de la generación o envío del enlace de reseteo de contraseña."""
     status: Literal["sent", "generated_only"]
     message: str

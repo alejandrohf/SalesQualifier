@@ -1,4 +1,8 @@
-"""Módulo `workflows/supervisor.py` de la plataforma Sales Qualification Agent."""
+"""Supervisor del workflow multiagente de cualificación.
+
+Orquesta la ejecución de agentes, aplica reglas deterministas, coordina la
+recuperación de referencias y prepara la notificación final.
+"""
 
 # workflows/supervisor.py
 from __future__ import annotations
@@ -554,7 +558,7 @@ def node_domain_rules_and_scoring(state: WorkflowState) -> WorkflowState:
         return state
 
 def node_run_risk_analyzer(state: WorkflowState) -> WorkflowState:
-    """Ejecuta `node_run_risk_analyzer` dentro de este modulo."""
+    """Ejecuta el analizador de riesgos y registra su salida textual en el estado."""
     _append_trace(state, "node_run_risk_analyzer:start")
 
     opportunity = state.get("opportunity")
@@ -589,7 +593,7 @@ INSTRUCCIÓN:
     return state
 
 def node_run_delivery_fit_analyzer(state: WorkflowState) -> WorkflowState:
-    """Ejecuta `node_run_delivery_fit_analyzer` dentro de este modulo."""
+    """Ejecuta el análisis de viabilidad técnica y de entrega de la oportunidad."""
     _append_trace(state, "node_run_delivery_fit_analyzer:start")
 
     opportunity = state.get("opportunity")
@@ -622,7 +626,7 @@ INSTRUCCIÓN:
     return state
 
 def node_run_commercial_fit_analyzer(state: WorkflowState) -> WorkflowState:
-    """Ejecuta `node_run_commercial_fit_analyzer` dentro de este modulo."""
+    """Ejecuta el análisis comercial orientado a margen, modelo contractual y guardrails."""
     _append_trace(state, "node_run_commercial_fit_analyzer:start")
 
     opportunity = state.get("opportunity")

@@ -1,4 +1,8 @@
-"""Módulo `app/config.py` de la plataforma Sales Qualification Agent."""
+"""Configuración central de la aplicación y carga de variables de entorno.
+
+Este módulo concentra los parámetros de integración, autenticación, correo
+y persistencia usados por la API, la interfaz web y los workflows.
+"""
 
 import os
 from dotenv import load_dotenv
@@ -7,7 +11,7 @@ load_dotenv()
 
 class Config:
     # API Keys principales
-    """Define `Config` dentro de este modulo."""
+    """Contenedor estático de configuración cargada desde variables de entorno."""
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
     

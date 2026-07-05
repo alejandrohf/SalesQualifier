@@ -1,4 +1,4 @@
-"""Módulo `interfaces/api/dependencies.py` de la plataforma Sales Qualification Agent."""
+"""Dependencias técnicas de FastAPI para workflow y validación de configuración."""
 
 # interfaces/api/dependencies.py
 from __future__ import annotations

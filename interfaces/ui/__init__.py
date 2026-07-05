@@ -1,2 +1,2 @@
-"""Módulo `interfaces/ui/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Paquete de la interfaz web construida con Streamlit."""
 

@@ -1,4 +1,4 @@
-"""Módulo `agents/notifications.py` de la plataforma Sales Qualification Agent."""
+"""Agente de notificación responsable de componer y enviar el email final."""
 
 # agents/notifications.py
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""Módulo `tools/web_fetch.py` de la plataforma Sales Qualification Agent."""
+"""Recuperación de contexto público de sitios web corporativos con fallback a Tavily."""
 
 from __future__ import annotations
 

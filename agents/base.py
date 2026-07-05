@@ -1,4 +1,4 @@
-"""Módulo `agents/base.py` de la plataforma Sales Qualification Agent."""
+"""Configuración base del LLM compartido por los agentes especializados."""
 
 # agents/base.py
 from __future__ import annotations

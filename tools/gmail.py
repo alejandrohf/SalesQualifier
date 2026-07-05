@@ -1,4 +1,4 @@
-"""Módulo `tools/gmail.py` de la plataforma Sales Qualification Agent."""
+"""Inicialización perezosa de herramientas Gmail para el agente de notificaciones."""
 
 # tools/gmail.py
 from __future__ import annotations

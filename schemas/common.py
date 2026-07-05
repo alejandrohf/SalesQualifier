@@ -1,4 +1,8 @@
-"""Módulo `schemas/common.py` de la plataforma Sales Qualification Agent."""
+"""Tipos y modelos compartidos entre los distintos schemas de la aplicación.
+
+Centraliza literales reutilizables, el modelo base común y los metadatos de
+trazabilidad empleados por la API y los workflows.
+"""
 
 # schemas/common.py
 # tipos compartidos (enums/literals, base model, helpers)

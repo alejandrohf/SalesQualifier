@@ -1,4 +1,4 @@
-"""Módulo `schemas/scoring.py` de la plataforma Sales Qualification Agent."""
+"""Schemas relacionados con el resultado determinista del motor de scoring."""
 
 # schemas/scoring.py
 from __future__ import annotations

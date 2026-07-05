@@ -1,4 +1,4 @@
-"""Módulo `tools/tavily.py` de la plataforma Sales Qualification Agent."""
+"""Herramienta de búsqueda web con Tavily para enriquecer contexto externo."""
 
 # tools/tavily.py
 from __future__ import annotations

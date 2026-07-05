@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/pages/6_Health.py` de la plataforma Sales Qualification Agent."""
+"""Vista de salud general de la plataforma y de su configuración base."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ def _fmt_dt(value: object) -> str:
 
 
 def main():
-    """Ejecuta `main` dentro de este modulo."""
+    """Renderiza la página de health check consumiendo el endpoint operativo correspondiente."""
     set_page_config()
     require_authentication()
     sidebar_header()

@@ -1,4 +1,4 @@
-"""Módulo `infrastructure/db/session.py` de la plataforma Sales Qualification Agent."""
+"""Inicialización del engine SQLAlchemy y factoría de sesiones de base de datos."""
 
 # infrastructure/db/session.py
 from __future__ import annotations

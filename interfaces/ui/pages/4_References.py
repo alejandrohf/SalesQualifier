@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/pages/4_References.py` de la plataforma Sales Qualification Agent."""
+"""Gestión del catálogo de referencias y búsqueda semántica desde la interfaz web."""
 
 from __future__ import annotations
 
@@ -78,7 +78,7 @@ def _build_assistant_reply(search_data: dict[str, Any], api_base_url: str) -> st
 
 
 def main():
-    """Ejecuta `main` dentro de este modulo."""
+    """Renderiza la operativa de alta, búsqueda, descarga y reindexación de referencias."""
     set_page_config()
     require_authentication()
     sidebar_header()

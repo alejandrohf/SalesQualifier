@@ -1,4 +1,4 @@
-"""Módulo `tests/test_rules.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas unitarias de reglas estratégicas y detección de riesgos críticos."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Módulo `agents/delivery_fit_analyzer.py` de la plataforma Sales Qualification Agent."""
+"""Agente que evalúa viabilidad técnica, perfiles necesarios y enfoque de entrega."""
 
 # agents/delivery_fit_analyzer.py
 from __future__ import annotations

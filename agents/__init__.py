@@ -1,4 +1,4 @@
-"""Módulo `agents/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Exportaciones centralizadas de los agentes especializados del workflow."""
 
 # agents/__init__.py
 from .meddicc_analyzer import opportunity_analyzer

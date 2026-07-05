@@ -1,4 +1,4 @@
-"""Módulo `agents/meddicc_analyzer.py` de la plataforma Sales Qualification Agent."""
+"""Agente principal encargado de construir el análisis MEDDICC estructurado."""
 
 # agents/meddicc_analyzer.py
 from __future__ import annotations

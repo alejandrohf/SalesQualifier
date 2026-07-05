@@ -1,4 +1,4 @@
-"""Módulo `interfaces/api/main.py` de la plataforma Sales Qualification Agent."""
+"""Punto de entrada de la API FastAPI y configuración global de middlewares y rutas."""
 
 # interfaces/api/main.py
 from __future__ import annotations
@@ -15,7 +15,7 @@ from interfaces.api.auth_routes import router as auth_router
 
 def create_app() -> FastAPI:
     # Validar config al iniciar (estilo SOC)
-    """Ejecuta `create_app` dentro de este modulo."""
+    """Construye la aplicación FastAPI, valida configuración e instala routers y CORS."""
     config_status = validate_config_on_startup()
 
     if config_status["configured"]:

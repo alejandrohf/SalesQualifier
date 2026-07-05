@@ -1,4 +1,4 @@
-"""Módulo `tests/test_api_routes.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas de integración ligera sobre rutas principales y manejo de errores de la API."""
 
 from __future__ import annotations
 

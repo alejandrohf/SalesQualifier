@@ -1,4 +1,4 @@
-"""Módulo `schemas/__init__.py` de la plataforma Sales Qualification Agent."""
+"""Paquete que agrupa los contratos de datos y modelos Pydantic del sistema."""
 
 # schemas/__init__.py
 from .common import *

@@ -1,4 +1,4 @@
-"""Módulo `interfaces/ui/pages/7_API_Status.py` de la plataforma Sales Qualification Agent."""
+"""Vista de diagnóstico del estado de dependencias externas y APIs configuradas."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def _fmt_dt(value: object) -> str:
 
 
 def main():
-    """Ejecuta `main` dentro de este modulo."""
+    """Renderiza el estado detallado de APIs y servicios auxiliares de la solución."""
     set_page_config()
     require_authentication()
     sidebar_header()

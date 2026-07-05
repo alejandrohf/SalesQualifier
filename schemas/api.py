@@ -1,4 +1,4 @@
-"""Módulo `schemas/api.py` de la plataforma Sales Qualification Agent."""
+"""Módulo de definición de Objetos de la API de la plataforma Sales Qualification Agent."""
 
 # schemas/api.py
 from __future__ import annotations
@@ -13,20 +13,20 @@ from .scoring import ScoringSummary
 from .reference_match import ReferenceMatchesReport
 
 class QualifyRequest(AppBaseModel):
-    """Define `QualifyRequest` dentro de este modulo."""
+    """Payload de entrada para lanzar la cualificación completa de una oportunidad."""
     opportunity: OpportunityInput
     metadata: Metadata = Field(default_factory=Metadata)
 
 class QualifyResponse(AppBaseModel):
-    """Define `QualifyResponse` dentro de este modulo."""
+    """Respuesta consolidada del proceso de cualificación con análisis, scoring y referencias."""
     opportunity: OpportunityInput
-    meddicc_report: MeddiccReport| None = None
+    meddicc_report: MeddiccReport | None = None
     scoring: ScoringSummary
     reference_matches: Optional[ReferenceMatchesReport] = None
     metadata: Metadata = Field(default_factory=Metadata)
 
 class ErrorResponse(AppBaseModel):
-    """Define `ErrorResponse` dentro de este modulo."""
+    """Formato homogéneo de error expuesto por la API."""
     error: str
     detail: Optional[str] = None
     metadata: Metadata = Field(default_factory=Metadata)

@@ -1,4 +1,4 @@
-"""Módulo `tests/test_schema_opportunity.py` de la plataforma Sales Qualification Agent."""
+"""Pruebas del schema de entrada de oportunidades y de su validación temporal."""
 
 from __future__ import annotations
 

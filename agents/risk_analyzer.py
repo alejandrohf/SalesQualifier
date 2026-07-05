@@ -1,4 +1,4 @@
-"""Módulo `agents/risk_analyzer.py` de la plataforma Sales Qualification Agent."""
+"""Agente especializado en detectar riesgos comerciales, técnicos y operativos."""
 
 # agents/risk_analyzer.py
 from __future__ import annotations

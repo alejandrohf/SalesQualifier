@@ -1,4 +1,4 @@
-"""Módulo `interfaces/api/routes_references.py` de la plataforma Sales Qualification Agent."""
+"""Endpoints para gestionar el catálogo de referencias y su búsqueda semántica."""
 
 # interfaces/api/routes_references.py
 from __future__ import annotations
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/api/references", tags=["references"])
 
 @router.get("", response_model=list[CustomerReferenceOut])
 def api_list_references(limit: int = 50, offset: int = 0, _: Dict[str, Any] = Depends(require_sales_or_engineering())):
-    """Ejecuta `api_list_references` dentro de este modulo."""
+    """Devuelve el catálogo paginado de referencias corporativas."""
     refs = list_references(limit=limit, offset=offset)
     return [
         CustomerReferenceOut(
@@ -61,7 +61,7 @@ async def api_create_reference(
     document: UploadFile = File(...),
     _: Dict[str, Any] = Depends(require_sales_or_engineering()),
 ):
-    """Ejecuta `api_create_reference` dentro de este modulo."""
+    """Crea una referencia nueva y programa su indexación vectorial en segundo plano."""
     pdf = await document.read()
     meta = CustomerReferenceCreate(
         title=title,
@@ -81,7 +81,7 @@ async def api_create_reference(
 
 @router.post("/{reference_id}/reindex", response_model=dict)
 def api_reindex_reference(reference_id: UUID, background_tasks: BackgroundTasks, _: Dict[str, Any] = Depends(require_sales_or_engineering())):
-    """Ejecuta `api_reindex_reference` dentro de este modulo."""
+    """Relanza la indexación semántica de una referencia existente."""
     try:
         # programa la reindexación async para no bloquear API
         background_tasks.add_task(reindex_reference, reference_id)
@@ -92,7 +92,7 @@ def api_reindex_reference(reference_id: UUID, background_tasks: BackgroundTasks,
 
 @router.post("/search", response_model=dict)
 def api_search_references(payload: Dict[str, Any], _: Dict[str, Any] = Depends(require_sales_or_engineering())):
-    """Ejecuta `api_search_references` dentro de este modulo."""
+    """Ejecuta una búsqueda semántica en el repositorio de referencias."""
     query = (payload.get("query") or "").strip()
     if not query:
         raise HTTPException(status_code=422, detail="Missing 'query'")
@@ -124,7 +124,7 @@ def api_search_references(payload: Dict[str, Any], _: Dict[str, Any] = Depends(r
 
 @router.put("/{reference_id}", response_model=dict)
 def api_update_reference(reference_id: UUID, patch: Dict[str, Any], _: Dict[str, Any] = Depends(require_sales_or_engineering())):
-    """Ejecuta `api_update_reference` dentro de este modulo."""
+    """Actualiza la metadata de una referencia sin sustituir el documento."""
     try:
         update_reference_metadata(reference_id, patch)
         return {"status": "updated", "reference_id": str(reference_id)}
@@ -134,7 +134,7 @@ def api_update_reference(reference_id: UUID, patch: Dict[str, Any], _: Dict[str,
 
 @router.put("/{reference_id}/document", response_model=dict)
 async def api_replace_reference_document(reference_id: UUID, background_tasks: BackgroundTasks, document: UploadFile = File(...), _: Dict[str, Any] = Depends(require_sales_or_engineering())):
-    """Ejecuta `api_replace_reference_document` dentro de este modulo."""
+    """Sustituye el PDF de una referencia y fuerza su futura reindexación."""
     pdf = await document.read()
     try:
         replace_reference_pdf(reference_id, pdf)
@@ -146,7 +146,7 @@ async def api_replace_reference_document(reference_id: UUID, background_tasks: B
 
 @router.get("/{reference_id}/download")
 def api_download_reference(reference_id: UUID, _: Dict[str, Any] = Depends(require_sales_or_engineering())):
-    """Ejecuta `api_download_reference` dentro de este modulo."""
+    """Sirve el documento PDF asociado a una referencia concreta."""
     try:
         ref = get_reference(reference_id)
         return FileResponse(ref.document_path, media_type="application/pdf", filename=f"{reference_id}.pdf")
@@ -156,7 +156,7 @@ def api_download_reference(reference_id: UUID, _: Dict[str, Any] = Depends(requi
 
 @router.delete("/{reference_id}", response_model=dict)
 def api_delete_reference(reference_id: UUID, _: Dict[str, Any] = Depends(require_sales_or_engineering())):
-    """Ejecuta `api_delete_reference` dentro de este modulo."""
+    """Elimina una referencia y sus embeddings asociados."""
     try:
         delete_reference(reference_id)
         return {"status": "deleted", "reference_id": str(reference_id)}
