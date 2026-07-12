@@ -41,12 +41,13 @@ PROCESO OBLIGATORIO:
    - tipo colaboración (fixed_price/T&M/RFP)
 2) Llama SIEMPRE a vectorstore_search_references con:
    - top_k = 20
-   - filters = null (MVP) salvo que opportunity tenga industry/area/cloud MUY claros.
+   - filters = null o los filtros que tengas del objeto opportunity como Industry, Area, Cloud o Size.
 3) Si la tool devuelve 0 hits:
    - rehace una query más simple (solo objetivo + área + 2 keywords) y vuelve a llamar UNA vez.
 4) Construye la salida final:
    - Deduplica por reference_id quedándote con el mejor hit por referencia.
    - Devuelve máximo 5 referencias.
+   - Asegurate de no devolver referencias repetidas.
    - Para cada referencia, incluye:
        - similarity
        - best_chunk_snippet: chunk_text recortado a 900 chars

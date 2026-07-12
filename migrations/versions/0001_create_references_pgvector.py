@@ -14,7 +14,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Extensiones (como en init.sql)
+    # Extensiones
     op.execute("CREATE EXTENSION IF NOT EXISTS vector;")
     op.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto;")
 
@@ -43,7 +43,6 @@ def upgrade() -> None:
     op.create_index("idx_refs_customer", "customer_references", ["customer"])
     op.create_index("idx_refs_industry", "customer_references", ["industry"])
     op.create_index("idx_refs_area", "customer_references", ["area"])
-    # índice desc: usar SQL directo (Alembic no siempre soporta DESC portable)
     op.execute("CREATE INDEX IF NOT EXISTS idx_refs_updated_at ON customer_references(updated_at DESC);")
 
     # reference_embeddings (Vector 1536)
@@ -60,13 +59,12 @@ def upgrade() -> None:
         sa.Column("chunk_text", sa.Text(), nullable=False),
         sa.Column("chunk_hash", sa.Text(), nullable=False),
         sa.Column("token_count", sa.Integer(), nullable=True),
-        sa.Column("embedding", Vector(1536), nullable=False),  # ✅ text-embedding-3-small
+        sa.Column("embedding", Vector(1536), nullable=False),  # text-embedding-3-small
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
     )
 
     op.create_index("uq_ref_chunk", "reference_embeddings", ["reference_id", "chunk_index"], unique=True)
 
-    # ivfflat index (ANN)
     op.execute(
         """
         CREATE INDEX IF NOT EXISTS idx_ref_embed_ivfflat

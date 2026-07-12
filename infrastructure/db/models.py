@@ -21,7 +21,7 @@ from infrastructure.db.base import Base
 
 
 class CustomerReferenceORM(Base):
-    """Entidad ORM que representa una referencia corporativa reusable y su metadata."""
+    """Entidad ORM que representa una referencia de cliente y su metadata."""
     __tablename__ = "customer_references"
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -73,7 +73,7 @@ class ReferenceEmbeddingORM(Base):
     chunk_hash: Mapped[str] = mapped_column(String(64), nullable=False)  # sha256 hex
     token_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
-    # ⚠️ Ajusta dimensión si usas embedding 3072
+    # Nota para futuro. Ajustar dimensión si usas embedding 3072
     embedding: Mapped[list[float]] = mapped_column(Vector(1536), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

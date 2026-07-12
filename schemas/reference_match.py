@@ -16,7 +16,6 @@ class ReferenceMatch(AppBaseModel):
     title: str
     customer: str
     similarity: float = Field(..., ge=0.0, le=1.0)
-
     best_chunk_snippet: str = Field(..., max_length=1200)
     why_similar: List[str] = Field(default_factory=list, max_length=3)
     document_url: str

@@ -13,7 +13,7 @@ notification_agent = create_react_agent(
     model=llm,
     tools=gmail_tools,
     prompt="""
-Eres el especialista en comunicaciones del equipo comercial de Plain Concepts.
+Eres el especialista en comunicaciones del equipo comercial.
 
 Tu misión:
 - Preparar y ENVIAR un email por Gmail con el resumen del análisis de cualificación (MEDDICC + scoring determinista)

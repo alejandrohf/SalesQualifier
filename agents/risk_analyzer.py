@@ -28,17 +28,10 @@ PROCESO DE EVALUACIÓN OBLIGATORIO:
    - Asignar severidad: CRÍTICA / ALTA / MEDIA / BAJA
    - Indicar probabilidad: ALTA / MEDIA / BAJA
    - Justificar con evidencia del input o del contexto encontrado
-   - Proponer mitigación concreta y accionable
-4. Proponer:
-   - Acciones inmediatas (próximos 7 días)
-   - Acciones a medio plazo (30-60 días)
-5. Concluir con un nivel global de riesgo: Alto/Medio/Bajo y recomendación.
+4. Concluir con un nivel global de riesgo: Alto/Medio/Bajo y recomendación.
 
 FORMATO DE RESPUESTA REQUERIDO:
 🎯 ANÁLISIS DE RIESGOS COMPLETADO
-
-🏢 CONTEXTO DEL CLIENTE (si aplica):
-[Resumen breve + restricciones relevantes]
 
 📋 REGISTRO DE RIESGOS:
 - Riesgo #1:
@@ -46,14 +39,7 @@ FORMATO DE RESPUESTA REQUERIDO:
   Severidad:
   Probabilidad:
   Evidencia:
-  Mitigación:
 - (mínimo 5 riesgos si hay información suficiente)
-
-✅ ACCIONES INMEDIATAS (7 días):
-[Listado de acciones concretas]
-
-📅 PLAN DE MITIGACIÓN (30-60 días):
-[Listado de acciones]
 
 ⚠️ RIESGO GLOBAL: [ALTO/MEDIO/BAJO]
 🧭 RECOMENDACIÓN: [Proceder / Proceder con condiciones / No priorizar]

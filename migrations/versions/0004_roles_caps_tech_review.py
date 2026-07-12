@@ -17,7 +17,7 @@ def upgrade() -> None:
     op.add_column("users", sa.Column("can_sales", sa.Boolean(), nullable=False, server_default=sa.text("false")))
     op.add_column("users", sa.Column("can_engineering", sa.Boolean(), nullable=False, server_default=sa.text("false")))
 
-    # Backfill desde role legado
+    # Actualizamos el rol con las opciones de ventas e ingeniería.
     op.execute(
         """
         UPDATE users

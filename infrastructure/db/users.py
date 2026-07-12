@@ -64,7 +64,6 @@ def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
 def get_user_auth_by_email(email: str) -> Optional[Dict[str, Any]]:
     """
     Variante interna para autenticación: incluye password_hash.
-    No usar para payloads de salida API/UI.
     """
     with SessionLocal() as db:
         stmt = select(UserORM).where(UserORM.email == email.strip().lower())

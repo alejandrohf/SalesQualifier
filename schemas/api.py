@@ -1,4 +1,4 @@
-"""Esquemas de entrada y salida utilizados por los endpoints principales de la API."""
+"""Esquemas de entrada y salida utilizados por los endpoints de la API para el proceso de Qualify"""
 
 from __future__ import annotations
 

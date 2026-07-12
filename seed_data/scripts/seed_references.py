@@ -27,8 +27,7 @@ def _load_json(path: Path) -> Any:
 def _post_reference(api_base: str, ref: Dict[str, Any], pdf_path: Path, timeout_s: int = 180) -> Dict[str, Any]:
     url = f"{api_base.rstrip('/')}/api/references"
 
-    # Campos esperados por tu endpoint (Form + UploadFile)
-    # Ajusta si tu API espera otros nombres exactos.
+    # Campos esperados por el endpoint (Form + UploadFile)
     data = {
         "title": ref["title"],
         "customer": ref["customer"],

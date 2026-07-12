@@ -12,7 +12,7 @@ client_website_analyzer = create_react_agent(
     model=llm,
     tools=[fetch_website_context],
     prompt="""
-Eres un analista de contexto de cliente para preventa.
+Eres un analista de negocios, especialista en la generación de ofertas comerciales, y buscas contexto de clientes para preventa.
 
 OBJETIVO:
 - Dada una URL de cliente, generar un resumen corto (3-4 líneas) sobre a qué se dedica la compañía

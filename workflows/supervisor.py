@@ -81,7 +81,6 @@ def _safe_json_loads(raw: str) -> Any:
                 continue
         raise
 
-
 def _normalize_meddicc_payload(data: Any) -> Any:
     """Ajusta valores del informe MEDDICC antes de validarlos contra el esquema."""
     if not isinstance(data, dict):
@@ -121,7 +120,6 @@ def _should_run_deep_analysis(state: WorkflowState) -> str:
 def _route_stop_if_error(state: WorkflowState) -> str:
     return "stop" if state.get("status") == "error" else "continue"
 
-
 def _compute_reference_bonus(similarities: list[float]) -> float:
     """Calcula un bonus acotado según la similitud de las referencias recuperadas."""
     if not similarities:
@@ -142,7 +140,6 @@ def _compute_reference_bonus(similarities: list[float]) -> float:
         return 0.1
     return 0.0
 
-
 def _build_reference_query(opportunity: Any) -> str:
     data = jsonable_encoder(opportunity) if opportunity is not None else {}
     if not isinstance(data, dict):
@@ -158,7 +155,6 @@ def _build_reference_query(opportunity: Any) -> str:
     ]
     query = " ".join([str(p).strip() for p in parts if p]).strip()
     return query[:1200]
-
 
 def _fallback_reference_matches_report(state: WorkflowState) -> ReferenceMatchesReport | None:
     """Genera coincidencias de referencias sin depender de una respuesta estructurada del agente."""
@@ -199,7 +195,6 @@ def _fallback_reference_matches_report(state: WorkflowState) -> ReferenceMatches
         }
     )
     return report
-
 
 def _build_opportunity_context_for_email(opportunity: Any) -> dict[str, Any]:
     data = jsonable_encoder(opportunity) if opportunity is not None else {}
@@ -282,7 +277,6 @@ INSTRUCCIÓN:
     state["meddicc_report_raw"] = raw
     _append_trace(state, "node_meddicc_analyze:done")
     return state
-
 
 def node_run_client_website_context(state: WorkflowState) -> WorkflowState:
     """

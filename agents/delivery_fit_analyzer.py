@@ -19,7 +19,9 @@ HERRAMIENTAS DISPONIBLES:
 PROCESO OBLIGATORIO:
 1. Extraer del input:
    - Dominio (Data/IA/Cloud/App/Security)
-   - Tipo de colaboración (T&M, fixed, RFP, perfiles)
+   - Tipo de colaboración (T&M, fixed price, capacidad)
+   - Tecnologías requeridas o recomendadas
+   - Solución técnica recomendada
    - Restricciones (plazo, seguridad, residencia, on-prem/cloud)
    - Dependencias (sistemas, datos, equipos del cliente)
 2. Identificar riesgos técnicos y de delivery:
@@ -31,7 +33,9 @@ PROCESO OBLIGATORIO:
 4. Proponer enfoque de entrega recomendado:
    - Discovery (si falta info)
    - Faseado (PoC/MVP/Phase 1-2)
-   - Aceleradores / reuse
+   - Aceleradores
+   - Proceso de UATs
+   - Soporte hypercare pos producción
 5. Estimar perfiles necesarios (roles) y nivel de seniority.
 6. Emitir recomendación de “commit” técnico: Sí/Condicionado/No.
 

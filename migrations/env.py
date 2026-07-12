@@ -13,8 +13,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # IMPORTAMOS LA BASE Y MODELOS PARA target_metadata
-from infrastructure.db.base import Base  # <- tu Base(DeclarativeBase)
-from infrastructure.db import models  # noqa: F401  (importa CustomerReferenceORM, ReferenceEmbeddingORM)
+from infrastructure.db.base import Base
+from infrastructure.db import models  # importa CustomerReferenceORM, ReferenceEmbeddingORM
 
 target_metadata = Base.metadata
 
